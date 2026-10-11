@@ -30,7 +30,11 @@ flowchart TD
 | `design-tools.js`, `layout.js` | Group operations, verified layout application, guides and validation |
 | `layout-state.js` | Separate saved Chen/Crow’s Foot positions and routes; active projection, switching and legacy migration |
 | `edit-history.js` | Scoped field patches: view-specific drawing Undo/Redo and shared semantic changes |
-| `layout-engine.js` | Canonical topology order, cluster packing, component layout, geometry constraints and pure planning |
+| `layout-engine.js` | Dispatch to the active notation’s dedicated planner |
+| `chen-layout-engine.js` | Chen topology, entity/attribute clusters and diamond placement |
+| `crow-layout-engine.js` | Measured-table graph, level ordering, barycenter sweeps and band/component packing |
+| `layout-validation.js` | Final shape, path, label and coordinate constraints |
+| `layout-options.js` | Separate per-notation direction/spacing device preferences |
 | `connection-labels.js` | Stable role-label placement with reserved shape, marker, and label bounds |
 | `routing.js`, `label-layout.js` | Connection routing, geometry and label placement |
 | `interaction.js` | Pointer gestures, panning and zooming |

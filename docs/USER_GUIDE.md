@@ -62,7 +62,7 @@ Connections sit behind shapes. Straight and orthogonal routing are available. Or
 
 ### Organize a diagram
 
-Click **Auto layout** to apply the current layout settings. Open **Layout options** to choose Balanced, Left to right, or Top to bottom, plus Comfortable or Compact spacing. Preferences are saved on the device. Undo restores the previous arrangement in the active view; applying an identical arrangement does not add another Undo step. Chen and Crow’s Foot retain independent layouts.
+Click **Auto layout** to apply the current layout settings. Open **Layout options** to choose Balanced, Left to right, or Top to bottom, plus Comfortable or Compact spacing. Preferences are saved separately for each notation on the device. The dialog title identifies the view you are arranging. Undo restores the previous arrangement in the active view; applying an identical arrangement does not add another Undo step. Chen and Crow’s Foot retain independent layouts.
 
 The layout follows the graph's connections, aligns entity/table centers, reserves complete attribute trees, puts key attributes first, separates disconnected groups, and checks actual shape bounds. Relationship lines avoid shapes, and their labels have reserved space. Attributes still render with direct spokes behind shapes. Dense diagrams may have line crossings; a globally crossing-free drawing is not guaranteed.
 
@@ -82,7 +82,7 @@ Names, attributes, keys, SQL types, cardinality, participation, and creating/del
 
 ## Switch notation
 
-Choose Chen or Crow’s Foot from the notation selector. Both render the same conceptual model, with independently saved positions and line routes. Crow’s Foot shows entity attributes as rows and relationship endpoint markers. Relationships with attributes or multiple participants can appear as association boxes. Click a relationship name or use Outline to edit its rules. Attribute rows open their properties without moving hidden Chen coordinates. PK, PART, SET, and FX badges identify primary keys, partial keys, multivalued attributes, and derived attributes. A question mark means the cardinality has not been set. Auto Layout reserves space for the visible cards, while keeping attributes attached to their owners.
+Choose Chen or Crow’s Foot from the notation selector. Both render the same conceptual model, with independently saved positions and line routes. Crow’s Foot shows entity attributes as rows and relationship endpoint markers. Relationships with attributes or multiple participants can appear as association boxes. Click a relationship name or use Outline to edit its rules. Attribute rows open their properties without moving hidden Chen coordinates. PK, PART, SET, and FX badges identify primary keys, partial keys, multivalued attributes, and derived attributes. A question mark means the cardinality has not been set. Crow’s Foot has its own Auto Layout engine: connected table levels, measured card sizes, label corridors and wrapped bands for long Balanced layouts. It ignores Chen ellipse/diamond extents and retains the Chen arrangement.
 
 ## Save and organize
 
