@@ -2,6 +2,14 @@
 
 Auto layout plans a complete candidate, verifies it, and only then updates the diagram. The button uses device preferences; Layout options exposes Balanced, horizontal layers, vertical layers, and Comfortable/Compact spacing. Repeating an identical arrangement is a no-op in editor history.
 
+## Independent views and Undo
+
+Chen and Crow’s Foot share conceptual data, but each keeps its own saved node positions and edge routes. Auto layout, dragging, alignment, coordinate edits, routing choices and manual bends affect only the active notation. Switching notation restores that view and does not consume an Undo step.
+
+Drawing Undo/Redo selects only actions from the current view. Shared data edits (names, attributes, keys/types, cardinality, participation, node/relationship creation or deletion) are available in either view and update the common model. History applies changed fields rather than replacing an old whole-diagram snapshot, so a shared rename Undo keeps both layouts intact. Deleting/restoring an object restores both of its saved positions. A new shared edit invalidates redo branches; a drawing edit invalidates shared/current-view redo while keeping the other view’s drawing redo.
+
+Legacy diagrams seed both views from their existing coordinates once. Layouts persist in device/account storage, JSON backups, saved versions and shared diagrams. Undo/Redo remains an editor-session history, distinct from the durable 50-version history. Explicitly restoring a saved version restores that full saved diagram, including both layouts.
+
 ## Hard constraints
 
 - Visible shape bounds keep at least 28 units of clearance, including relationship diamonds and Chen attributes.
@@ -25,7 +33,7 @@ Crow's Foot keeps hidden Chen attributes relative to their owner when possible; 
 
 A dense or non-planar graph can still have line crossings. This is not a guarantee of a crossing-free embedding or the globally smallest drawing. Shared/cyclic attributes are preserved and positioned consistently, but automatic layout does not repair their conceptual meaning. Very large requested horizontal/vertical arrangements can fall back to Balanced; diagrams that cannot fit the supported coordinate limits need splitting into smaller diagrams.
 
-Names, node types, keys, cardinalities, participation, roles, and other model flags are preserved. Automatic layout intentionally replaces manual bend points and route choices; Undo restores them along with node positions. The account database and generated SQL schema are not changed by layout.
+Names, node types, keys, cardinalities, participation, roles, and other model flags are preserved. Automatic layout intentionally replaces manual bend points and route choices in the active view; Undo restores them along with that view’s node positions. The account database and generated SQL schema are not changed by layout.
 
 ## Validation
 

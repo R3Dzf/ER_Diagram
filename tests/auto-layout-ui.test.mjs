@@ -20,4 +20,15 @@ test('Chen Auto layout renders and saves the hub, places the relationship attrib
  // A second identical arrangement does not consume another Undo step.
  $('layoutBtn').click();$('undoBtn').click();assert.deepEqual(positions(current()),positions(before));$('redoBtn').click();assert.deepEqual(positions(current()),positions(after));
  $('layoutSettingsBtn').click();assert.equal($('layoutDialog').hasAttribute('open'),true);$('layoutDirection').value='vertical';$('layoutSpacing').value='compact';$('applyLayoutBtn').click();assert.equal($('layoutDialog').hasAttribute('open'),false);assert.match($('layoutResult').textContent,/spacing verified/);assert.notDeepEqual(positions(current()),positions(after));assert.deepEqual(JSON.parse(saved.get('bosha-layout-options')),{direction:'vertical',spacing:'compact'});$('undoBtn').click();assert.deepEqual(positions(current()),positions(after));
+ // Switching presentation is not an Undo step; each view keeps its geometry.
+ const switchTo=notation=>{$('notationSelect').value=notation;$('notationSelect').onchange({target:$('notationSelect')});};
+ switchTo('crowfoot');assert.equal($('undoBtn').disabled,true);assert.deepEqual(positions(current()),positions(before));
+ $('layoutBtn').click();const crowAfter=current();assert.notDeepEqual(positions(crowAfter),positions(before));
+ switchTo('chen');assert.deepEqual(positions(current()),positions(after));switchTo('crowfoot');$('undoBtn').click();assert.deepEqual(positions(current()),positions(before));$('redoBtn').click();assert.deepEqual(positions(current()),positions(crowAfter));
+ // Live name edits are shared, but their Undo does not roll back either layout.
+ const bookId=after.nodes.find(n=>n.name==='Book').id;doc.querySelector(`[data-outline="${bookId}"]`).click();$('nodeName').value='Books renamed';$('nodeName').oninput();$('nodeName').onblur();
+ switchTo('chen');assert.equal(current().nodes.find(n=>n.id===bookId).name,'Books renamed');$('undoBtn').click();assert.equal(current().nodes.find(n=>n.id===bookId).name,'Book');assert.deepEqual(positions(current()),positions(after));
+ switchTo('crowfoot');assert.deepEqual(positions(current()),positions(crowAfter));$('redoBtn').click();assert.equal(current().nodes.find(n=>n.id===bookId).name,'Books renamed');
+ // Creating a relationship is data: Undo/Redo is available from the other view.
+ window.HTMLInputElement.prototype.select=()=>{};doc.querySelector('[data-add="relationship"]').click();const added=current().nodes.at(-1).id;switchTo('chen');assert.ok(current().nodes.some(n=>n.id===added));$('undoBtn').click();assert.ok(!current().nodes.some(n=>n.id===added));assert.deepEqual(positions(current()),positions(after));switchTo('crowfoot');$('redoBtn').click();assert.ok(current().nodes.some(n=>n.id===added));
 });

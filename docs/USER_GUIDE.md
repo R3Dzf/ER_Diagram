@@ -62,7 +62,7 @@ Connections sit behind shapes. Straight and orthogonal routing are available. Or
 
 ### Organize a diagram
 
-Click **Auto layout** to apply the current layout settings. Open **Layout options** to choose Balanced, Left to right, or Top to bottom, plus Comfortable or Compact spacing. Preferences are saved on the device. Undo restores the previous arrangement; applying an identical arrangement does not add another Undo step.
+Click **Auto layout** to apply the current layout settings. Open **Layout options** to choose Balanced, Left to right, or Top to bottom, plus Comfortable or Compact spacing. Preferences are saved on the device. Undo restores the previous arrangement in the active view; applying an identical arrangement does not add another Undo step. Chen and Crow’s Foot retain independent layouts.
 
 The layout follows the graph's connections, aligns entity/table centers, reserves complete attribute trees, puts key attributes first, separates disconnected groups, and checks actual shape bounds. Relationship lines avoid shapes, and their labels have reserved space. Attributes still render with direct spokes behind shapes. Dense diagrams may have line crossings; a globally crossing-free drawing is not guaranteed.
 
@@ -74,9 +74,15 @@ The complete candidate is checked before it changes the live diagram. If spacing
 
 Use **Validate** to list available checks and jump to affected elements. Resolve issues before generating SQL. Validation cannot infer business rules from arbitrary labels, and a clean validation result does not prove a database design is complete.
 
+## Drawing Undo and shared data
+
+Moving elements, arranging a view, aligning shapes, editing coordinates, and changing line routes have separate Undo/Redo in Chen and Crow’s Foot. Switching notation is a view change, so Undo does not switch you back.
+
+Names, attributes, keys, SQL types, cardinality, participation, and creating/deleting elements or relationships remain shared. Undoing one of these edits from either view updates both views’ data without restoring the other view’s old layout. Your layouts survive reloading and JSON/account saves; the immediate Undo timeline lasts for the open editor session. Version history restores the complete saved diagram, including both layouts.
+
 ## Switch notation
 
-Choose Chen or Crow’s Foot from the notation selector. Both render the same conceptual model. Crow’s Foot shows entity attributes as rows and relationship endpoint markers. Relationships with attributes or multiple participants can appear as association boxes. Click a relationship name or use Outline to edit its rules. Attribute rows open their properties without moving hidden Chen coordinates. PK, PART, SET, and FX badges identify primary keys, partial keys, multivalued attributes, and derived attributes. A question mark means the cardinality has not been set. Auto Layout reserves space for the visible cards, while keeping attributes attached to their owners.
+Choose Chen or Crow’s Foot from the notation selector. Both render the same conceptual model, with independently saved positions and line routes. Crow’s Foot shows entity attributes as rows and relationship endpoint markers. Relationships with attributes or multiple participants can appear as association boxes. Click a relationship name or use Outline to edit its rules. Attribute rows open their properties without moving hidden Chen coordinates. PK, PART, SET, and FX badges identify primary keys, partial keys, multivalued attributes, and derived attributes. A question mark means the cardinality has not been set. Auto Layout reserves space for the visible cards, while keeping attributes attached to their owners.
 
 ## Save and organize
 

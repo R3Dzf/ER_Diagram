@@ -28,6 +28,8 @@ flowchart TD
 | `crowfoot.js` | Crow’s Foot cards, association views, endpoint markers, parallel lanes, and recursive loops |
 | `relationship-tools.js` | Participant lookup and consistent cardinality/participation updates |
 | `design-tools.js`, `layout.js` | Group operations, verified layout application, guides and validation |
+| `layout-state.js` | Separate saved Chen/Crow’s Foot positions and routes; active projection, switching and legacy migration |
+| `edit-history.js` | Scoped field patches: view-specific drawing Undo/Redo and shared semantic changes |
 | `layout-engine.js` | Canonical topology order, cluster packing, component layout, geometry constraints and pure planning |
 | `connection-labels.js` | Stable role-label placement with reserved shape, marker, and label bounds |
 | `routing.js`, `label-layout.js` | Connection routing, geometry and label placement |
@@ -60,6 +62,10 @@ The persisted/exported conceptual diagram uses `version: 1`, a title, optional n
   ]
 }
 ```
+
+Node geometry optionally includes `chenPosition` and `crowfootPosition` (`{x,y}`); edges optionally include `chenRoute` and `crowfootRoute` (`{routing,points}`). Top-level node `x/y` and edge `routing/points` project the active `notation` for rendering and legacy compatibility. Validation strictly checks hidden geometry and restores the active projection. Legacy models remain accepted; first editing/switching seeds both saved views without changing existing coordinates.
+
+Three-way merges compose the two position/route fields independently, omit active projection fields from conflict selection, and retain the receiving editor's notation. Real conflicting edits to the same view still produce a conflict. Account schemas need no SQL migration because layouts live in the existing model JSON.
 
 Node types are `entity`, `relationship`, and `attribute`. Flags represent weak/identifying elements, keys, derived/multivalued/composite attributes, and SQL properties. Validation normalizes supported fields and rejects invalid IDs, dangling references, invalid names/positions, oversized graphs, and unsupported model versions.
 
