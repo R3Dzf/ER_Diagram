@@ -156,3 +156,4 @@
 [data-theme="dark"] .sql-severity{background:#3a3023;color:#efc780}
 [data-theme="dark"] .sql-diagnostic.info .sql-severity,[data-theme="dark"] .sql-badge{background:#24394c;color:#a8d8e8}
 [data-theme="dark"] .sql-badge.foreign{background:#3a304f;color:#cab5f2}
+[data-theme="dark"] .layout-rules li:before{color:#b7c9ff}

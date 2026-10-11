@@ -17,5 +17,7 @@ test('Chen Auto layout renders and saves the hub, places the relationship attrib
  assert.equal(stocks.x,book.x);assert.equal(copies.y,stocks.y);assert.notEqual(copies.x,stocks.x);
  for(const n of after.nodes)assert.equal(doc.querySelector(`#graph [data-node="${n.id}"]`).getAttribute('transform'),`translate(${n.x},${n.y})`);
  for(let i=0;i<before.edges.length;i++)for(const field of ['labelSource','labelTarget','totalSource','totalTarget','source','target'])assert.equal(after.edges[i][field],before.edges[i][field]);
- $('undoBtn').click();assert.deepEqual(positions(current()),positions(before));$('redoBtn').click();assert.deepEqual(positions(current()),positions(after));
+ // A second identical arrangement does not consume another Undo step.
+ $('layoutBtn').click();$('undoBtn').click();assert.deepEqual(positions(current()),positions(before));$('redoBtn').click();assert.deepEqual(positions(current()),positions(after));
+ $('layoutSettingsBtn').click();assert.equal($('layoutDialog').hasAttribute('open'),true);$('layoutDirection').value='vertical';$('layoutSpacing').value='compact';$('applyLayoutBtn').click();assert.equal($('layoutDialog').hasAttribute('open'),false);assert.match($('layoutResult').textContent,/spacing verified/);assert.notDeepEqual(positions(current()),positions(after));assert.deepEqual(JSON.parse(saved.get('bosha-layout-options')),{direction:'vertical',spacing:'compact'});$('undoBtn').click();assert.deepEqual(positions(current()),positions(after));
 });

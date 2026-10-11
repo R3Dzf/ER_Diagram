@@ -32,7 +32,7 @@ Guest diagrams save on the current device. Signed-in users get private account w
 | Canvas | Hold and drag empty space to pan, pointer-centered zoom, fit to screen, grid, snapping, alignment guides, and touch/pointer controls |
 | Editing | Names update as you type; Undo/Redo, multiple selection, group move, copy/paste, alignment, and distribution |
 | Connected movement | Moving an entity also moves its attached attribute tree; moving an attribute alone leaves the entity in place |
-| Lines and layout | Connections render behind shapes; straight/orthogonal routing, draggable bends, and deterministic, undoable auto layout |
+| Lines and layout | Connections render behind shapes; straight/orthogonal routing, draggable bends, and structured auto layout with verified spacing, explicit direction/spacing controls, and Undo |
 | Notation | Chen and Crow’s Foot views share one underlying conceptual model |
 | Validation | Locate issues such as missing keys, incomplete relationships, disconnected elements, and shape-crossing connections |
 | SQL | Schema studio for PostgreSQL, MySQL 8.0.16+, and SQLite, with table previews, mapping notes, indexes, and review warnings |

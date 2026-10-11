@@ -60,6 +60,14 @@ For a recursive relationship, add clear role labels such as Manager and Subordin
 
 Connections sit behind shapes. Straight and orthogonal routing are available. Orthogonal routing avoids obstacles when a route can be found; manually adjust bends for difficult drawings.
 
+### Organize a diagram
+
+Click **Auto layout** to apply the current layout settings. Open **Layout options** to choose Balanced, Left to right, or Top to bottom, plus Comfortable or Compact spacing. Preferences are saved on the device. Undo restores the previous arrangement; applying an identical arrangement does not add another Undo step.
+
+The layout follows the graph's connections, aligns entity/table centers, reserves complete attribute trees, puts key attributes first, separates disconnected groups, and checks actual shape bounds. Relationship lines avoid shapes, and their labels have reserved space. Attributes still render with direct spokes behind shapes. Dense diagrams may have line crossings; a globally crossing-free drawing is not guaranteed.
+
+The complete candidate is checked before it changes the live diagram. If spacing or clear relationship routes cannot be verified, your previous positions are retained. Very large horizontal/vertical layouts can use Balanced to stay within canvas limits. See [Layout rules](LAYOUT.md) for the exact constraints and test coverage.
+
 ## Arrange and validate
 
 **Auto layout** arranges the whole diagram. It accounts for connected entities, entity/relationship attribute trees, and notation-specific sizes. Branching Chen diagrams distribute connected entities across separate directions. All positions remain editable, and **Undo** restores the previous arrangement.

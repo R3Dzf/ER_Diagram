@@ -27,7 +27,9 @@ flowchart TD
 | `sql-preview.js` | Schema studio controls, syntax highlighting, table previews, and mapping review |
 | `crowfoot.js` | Crow’s Foot cards, association views, endpoint markers, parallel lanes, and recursive loops |
 | `relationship-tools.js` | Participant lookup and consistent cardinality/participation updates |
-| `design-tools.js`, `layout.js` | Group operations, layout, guides and validation |
+| `design-tools.js`, `layout.js` | Group operations, verified layout application, guides and validation |
+| `layout-engine.js` | Canonical topology order, cluster packing, component layout, geometry constraints and pure planning |
+| `connection-labels.js` | Stable role-label placement with reserved shape, marker, and label bounds |
 | `routing.js`, `label-layout.js` | Connection routing, geometry and label placement |
 | `interaction.js` | Pointer gestures, panning and zooming |
 | `workspace.js`, `dashboard-tools.js` | Guest project persistence/migration and dashboard filtering/totals |
