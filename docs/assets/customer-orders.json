@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "title": "Customer orders",
+  "notation": "chen",
+  "nodes": [
+    {
+      "id": "customer",
+      "type": "entity",
+      "name": "Customer",
+      "x": 200,
+      "y": 320
+    },
+    {
+      "id": "places",
+      "type": "relationship",
+      "name": "Places",
+      "x": 450,
+      "y": 320
+    },
+    {
+      "id": "order",
+      "type": "entity",
+      "name": "Order",
+      "x": 700,
+      "y": 320
+    },
+    {
+      "id": "customerId",
+      "type": "attribute",
+      "name": "customer_id",
+      "key": true,
+      "x": 200,
+      "y": 120
+    },
+    {
+      "id": "orderId",
+      "type": "attribute",
+      "name": "order_id",
+      "key": true,
+      "x": 700,
+      "y": 120
+    }
+  ],
+  "edges": [
+    {
+      "id": "customerPlaces",
+      "source": "customer",
+      "target": "places",
+      "labelSource": "1",
+      "routing": "straight"
+    },
+    {
+      "id": "placesOrder",
+      "source": "places",
+      "target": "order",
+      "labelTarget": "N",
+      "totalTarget": true,
+      "routing": "straight"
+    },
+    {
+      "id": "customerKey",
+      "source": "customer",
+      "target": "customerId",
+      "routing": "straight"
+    },
+    {
+      "id": "orderKey",
+      "source": "order",
+      "target": "orderId",
+      "routing": "straight"
+    }
+  ]
+}

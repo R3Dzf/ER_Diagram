@@ -1,0 +1,16 @@
+import {validateModel,exportSVG} from '/studio/core.js';
+import {setupTheme} from '/studio/theme.js';
+const $=id=>document.getElementById(id),theme=setupTheme();let model=null,svg=null,original=null,box=null,drag=null,loading=false;
+const token=location.hash.slice(1);
+function view(){svg?.setAttribute('viewBox',`${box.x} ${box.y} ${box.w} ${box.h}`);}
+function fit(){if(!original)return;box={...original};view();}
+function render(){if(!model)return;const data=exportSVG(model,{title:false,background:document.documentElement.dataset.theme==='dark'?'dark':'white'});$('viewport').innerHTML=data.svg;svg=$('viewport').querySelector('svg');const [x,y,w,h]=svg.getAttribute('viewBox').split(' ').map(Number);original={x,y,w,h};svg.removeAttribute('width');svg.removeAttribute('height');fit();}
+function zoom(factor,rx=.5,ry=.5){if(!box)return;const w=Math.max(original.w/12,Math.min(original.w*8,box.w*factor)),h=w*box.h/box.w;box={x:box.x+(box.w-w)*rx,y:box.y+(box.h-h)*ry,w,h};view();}
+function point(e){if(!svg)return null;const matrix=svg.getScreenCTM();return matrix?new DOMPoint(e.clientX,e.clientY).matrixTransform(matrix.inverse()):null;}
+async function load(){if(loading)return;loading=true;$('refresh').disabled=true;$('status').hidden=false;$('status').textContent='Opening this diagram…';$('viewport').hidden=true;model=null;svg=null;box=null;try{if(!/^[A-Za-z0-9_-]{43}$/.test(token))throw Error('This link is unavailable or has expired.');const response=await fetch('/api/shares/view',{method:'POST',credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(12000),headers:{'Content-Type':'application/json'},body:JSON.stringify({token})});const data=await response.json();if(!response.ok)throw Error(data.error||'This link is unavailable.');model=validateModel(data.model);$('title').textContent=model.title;document.title=model.title+' · Bosha Studio';$('details').textContent='Saved '+new Date(data.updatedAt).toLocaleString('en');$('status').hidden=true;$('viewport').hidden=false;render();}catch(error){$('title').textContent='Shared diagram';$('details').textContent='';$('viewport').replaceChildren();$('status').textContent=navigator.onLine===false?'Connect to the internet to open shared diagrams.':error.message||'Could not open this diagram. Try refreshing.';}finally{loading=false;$('refresh').disabled=false;}}
+$('viewport').addEventListener('pointerdown',e=>{if(e.button!==0)return;const p=point(e);if(!p)return;drag={pointer:e.pointerId,start:p,box:{...box}};$('viewport').setPointerCapture(e.pointerId);});
+$('viewport').addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.pointer)return;const p=point(e);if(!p)return;box.x-=p.x-drag.start.x;box.y-=p.y-drag.start.y;view();});
+for(const event of ['pointerup','pointercancel'])$('viewport').addEventListener(event,()=>drag=null);
+$('viewport').addEventListener('wheel',e=>{if(!box)return;e.preventDefault();const p=point(e);if(p)zoom(Math.exp(Math.max(-.25,Math.min(.25,e.deltaY*.002))),(p.x-box.x)/box.w,(p.y-box.y)/box.h);},{passive:false});
+$('zoomOut').onclick=()=>zoom(1.2);$('zoomIn').onclick=()=>zoom(1/1.2);$('fit').onclick=fit;$('refresh').onclick=load;$('theme').onclick=()=>{theme.set(document.documentElement.dataset.theme==='dark'?'light':'dark');render();};
+load();

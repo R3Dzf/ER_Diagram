@@ -1,0 +1,14 @@
+export const CACHE_NAME='bosha-shell-welcome-home-9';
+export const STATIC_FILES=['/studio/','/studio/style.css','/studio/dashboard.css','/studio/theme.css','/studio/features.css','/studio/experience.css','/studio/notifications.js','/studio/app.js','/studio/core.js','/studio/relationship-tools.js','/studio/routing.js','/studio/layout.js','/studio/label-layout.js','/studio/design-tools.js','/studio/crowfoot.js','/studio/sql.js','/studio/cloud.js','/studio/merge.js','/studio/collaboration.js','/studio/workspace.js','/studio/presets.js','/studio/icons.js','/studio/interaction.js','/studio/vector-pdf.js','/studio/dashboard-tools.js','/studio/theme.js','/studio/pwa.js','/studio/offline.js','/studio/vendor/fontkit.js','/studio/vendor/pdf-lib.js','/studio/fonts/regular.ttf','/studio/fonts/bold.ttf','/icons/bosha-192.png','/icons/bosha-512.png','/icons/bosha-maskable.png','/icons/bosha-symbol.svg','/icons/bosha-mark-192.png','/icons/bosha-mark-512.png','/icons/bosha-mark-maskable.png','/icons/bosha-apple-180.png','/icons/bosha-favicon.ico','/manifest.webmanifest'];
+export function cacheablePath(request,origin){const url=new URL(request.url),path=url.pathname==='/studio/index.html'?'/studio/':url.pathname;return request.method==='GET'&&url.origin===origin&&STATIC_FILES.includes(path)?path:null;}
+export async function installShell(cache,fetcher=fetch){await Promise.all(STATIC_FILES.map(async path=>{const response=await fetcher(new Request(new URL(path,globalThis.location?.origin||'https://studio.test'),{cache:'reload',credentials:'same-origin'}));if(!response.ok||response.redirected)throw Error('Could not prepare offline tools.');await cache.put(path,response);}));}
+if(typeof self!=='undefined'&&self.addEventListener){
+ self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE_NAME).then(cache=>installShell(cache))));
+ self.addEventListener('activate',event=>event.waitUntil((async()=>{for(const key of await caches.keys())if(key.startsWith('bosha-shell-')&&key!==CACHE_NAME)await caches.delete(key);await self.clients.claim();})()));
+ self.addEventListener('message',event=>{if(event.data?.type==='ACTIVATE_UPDATE')self.skipWaiting();});
+ self.addEventListener('fetch',event=>{const request=event.request,path=cacheablePath(request,self.location.origin);if(path){event.respondWith(caches.open(CACHE_NAME).then(async cache=>(await cache.match(path))||fetch(request)));return;}
+  // Never intercept account, API or shared-viewer requests. A revoked link and
+  // a signed-out session must always be checked against the current server.
+  const url=new URL(request.url);if(request.method==='GET'&&url.origin===self.location.origin&&request.mode==='navigate'&&url.pathname==='/')event.respondWith(fetch(request).catch(async()=>{const cached=await caches.match('/studio/');return cached||new Response('Open Bosha Studio online once to prepare offline tools.',{status:503,headers:{'Content-Type':'text/plain'}});}));
+ });
+}

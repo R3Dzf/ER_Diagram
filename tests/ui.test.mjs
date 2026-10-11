@@ -1,0 +1,55 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {parseHTML} from 'linkedom';import fs from 'node:fs';
+test('the real editor initializes, adds nodes, changes notation, generates SQL and opens validation/account dialogs',async()=>{const {window}=parseHTML(fs.readFileSync(new URL('../public/studio/index.html',import.meta.url),'utf8'));const {document}=window;globalThis.window=window;globalThis.document=document;globalThis.innerWidth=1440;globalThis.ResizeObserver=class{observe(){}};window.HTMLInputElement.prototype.select=function(){};const saved=new Map();globalThis.localStorage={getItem:k=>saved.get(k)||null,setItem:(k,v)=>saved.set(k,v)};globalThis.fetch=async()=>Response.json({user:null,projects:[]});Object.defineProperty(window.HTMLSelectElement.prototype,'value',{configurable:true,get(){return this.querySelector('option[selected]')?.getAttribute('value')||this.querySelector('option')?.getAttribute('value')||'';},set(v){for(const o of this.querySelectorAll('option'))o.toggleAttribute('selected',o.getAttribute('value')===String(v));}});for(const dialog of document.querySelectorAll('dialog')){dialog.showModal=()=>dialog.setAttribute('open','');dialog.close=()=>dialog.removeAttribute('open');}await import('../public/studio/app.js');for(let i=0;i<5;i++)await new Promise(r=>setImmediate(r));assert.equal(document.getElementById('accountLoading').hidden,true);document.getElementById('newCard').click();document.querySelector('[data-add="entity"]').click();assert.match(document.getElementById('graph').innerHTML,/Entity 1/);document.querySelector('[data-add="attribute"]').click();assert.match(document.getElementById('inspectorContent').innerHTML,/SQL data type/);
+// Exercise actual pointer handlers, persistence, and Undo with an entity tree.
+const canvas=document.getElementById('canvas');canvas.setPointerCapture=()=>{};canvas.getScreenCTM=()=>({inverse:()=>({})});
+globalThis.DOMPoint=class{constructor(x,y){this.x=x;this.y=y;}matrixTransform(){return this;}};
+const current=()=>{const db=JSON.parse(saved.get('bosha-er-studio-projects-v2'));return db.projects.find(p=>p.id===db.activeId).model;};
+const original=current(),entity=original.nodes.find(n=>n.type==='entity'),attribute=original.nodes.find(n=>n.type==='attribute');
+const fire=(target,type,x,y)=>{const e=new window.Event(type,{bubbles:true,cancelable:true});Object.assign(e,{pointerId:1,button:0,clientX:x,clientY:y,shiftKey:false,altKey:true});target.dispatchEvent(e);};
+fire(document.querySelector(`[data-node="${entity.id}"] rect`),'pointerdown',entity.x,entity.y);
+fire(canvas,'pointermove',entity.x+123,entity.y+77);fire(canvas,'pointerup',entity.x+123,entity.y+77);
+let moved=current();for(const n of moved.nodes){const old=original.nodes.find(o=>o.id===n.id);assert.equal(n.x-old.x,123);assert.equal(n.y-old.y,77);}
+document.getElementById('undoBtn').click();assert.deepEqual(current(),original);
+// Moving an attribute by itself must leave its owning entity in place.
+fire(document.querySelector(`[data-node="${attribute.id}"] ellipse`),'pointerdown',attribute.x,attribute.y);
+fire(canvas,'pointermove',attribute.x+60,attribute.y-40);fire(canvas,'pointerup',attribute.x+60,attribute.y-40);
+moved=current();assert.equal(moved.nodes.find(n=>n.id===entity.id).x,entity.x);assert.equal(moved.nodes.find(n=>n.id===attribute.id).x,attribute.x+60);
+document.getElementById('layoutBtn').click();assert.ok(current().edges.every(e=>e.routing==='straight'));
+const notation=document.getElementById('notationSelect');notation.value='crowfoot';notation.onchange({target:notation});assert.match(document.getElementById('graph').innerHTML,/No attributes|Attribute 1/);document.getElementById('sqlBtn').click();assert.match(document.getElementById('sqlPreview').textContent,/CREATE TABLE/);document.getElementById('validateBtn').click();assert.match(document.getElementById('issuesContent').textContent,/key/);document.getElementById('accountBtn').click();assert.match(document.getElementById('accountContent').innerHTML,/Continue with ChatGPT/);assert.match(document.getElementById('accountContent').innerHTML,/Continue with Google/);assert.equal(document.querySelector('a[href="/account/google.html"]').getAttribute('target'),'_top');
+for(const dialog of document.querySelectorAll('dialog'))dialog.close();
+document.getElementById('workspaceNav').click();assert.equal(document.body.classList.contains('dashboard-mode'),true);
+assert.equal(document.getElementById('diagramsTotal').textContent,'1');assert.equal(document.getElementById('entitiesTotal').textContent,'1');assert.equal(document.getElementById('connectionsTotal').textContent,'1');
+assert.equal(document.getElementById('continueStrip').hidden,false);assert.equal(document.querySelectorAll('[data-recent]').length,1);
+// Searching templates must have its own empty state and create actual projects.
+document.getElementById('heroTemplates').click();assert.equal(document.getElementById('templatesTab').getAttribute('aria-selected'),'true');assert.equal(document.getElementById('notationFilterLabel').hidden,true);
+const search=document.getElementById('projectSearch');search.value='not-a-template';search.oninput();assert.equal(document.getElementById('noResults').hidden,false);assert.equal(document.getElementById('noResultsTitle').textContent,'No templates found');
+document.getElementById('resetDashboardFilters').click();assert.equal(document.getElementById('noResults').hidden,true);
+document.querySelector('[data-template="inventory"]').click();assert.equal(document.body.classList.contains('dashboard-mode'),false);document.getElementById('workspaceNav').click();
+document.getElementById('heroTemplates').click();document.querySelector('[data-template="commerce"]').click();document.getElementById('workspaceNav').click();
+assert.equal(document.getElementById('diagramsTotal').textContent,'3');assert.equal(document.getElementById('entitiesTotal').textContent,'7');
+const filter=document.getElementById('notationFilter');filter.value='chen';filter.onchange();assert.equal(document.querySelectorAll('#projectGrid .project-card').length,2);
+const sort=document.getElementById('projectSort');sort.value='name';sort.onchange();assert.deepEqual([...document.querySelectorAll('#projectGrid .card-name')].map(n=>n.textContent),['Commerce architecture','Inventory model']);
+document.getElementById('listViewBtn').click();assert.equal(document.getElementById('projectGrid').classList.contains('list-view'),true);assert.equal(document.getElementById('listViewBtn').getAttribute('aria-pressed'),'true');
+search.value='missing project';search.oninput();assert.equal(document.getElementById('noResults').hidden,false);assert.equal(document.getElementById('newCard').hidden,true);
+document.getElementById('resetDashboardFilters').click();assert.equal(document.querySelectorAll('#projectGrid .project-card').length,3);
+// A duplicate has new identifiers and the delete Undo restores the same project.
+const originalTitle=document.querySelector('#projectGrid .card-name').textContent;document.querySelector('#projectGrid [data-copy]').click();document.getElementById('workspaceNav').click();assert.equal(document.getElementById('diagramsTotal').textContent,'4');assert.ok([...document.querySelectorAll('#projectGrid .card-name')].some(n=>n.textContent===originalTitle+' copy'));
+document.querySelector('#projectGrid [data-delete]').click();assert.equal(document.getElementById('diagramsTotal').textContent,'3');document.getElementById('toastUndo').click();assert.equal(document.getElementById('diagramsTotal').textContent,'4');
+// Relationship controls configure each connected entity; new edges never get two defaults.
+document.getElementById('newCard').click();document.querySelector('[data-add="entity"]').click();document.querySelector('[data-add="entity"]').click();document.querySelector('[data-add="relationship"]').click();
+const relationship=current().nodes.find(n=>n.type==='relationship'),entities=current().nodes.filter(n=>n.type==='entity');
+assert.match(document.getElementById('inspectorContent').textContent,/Connect this relationship to an entity/);
+document.getElementById('connectSelected').click();fire(document.querySelector(`[data-node="${entities[0].id}"] rect`),'pointerdown',0,0);
+document.querySelector(`[data-outline="${entities[1].id}"]`).click();document.getElementById('connectSelected').click();fire(document.querySelector(`[data-node="${relationship.id}"] polygon`),'pointerdown',0,0);
+assert.equal(document.querySelectorAll('[data-participant]').length,2);assert.equal(document.getElementById('nodeName').value,relationship.name);
+assert.ok(current().edges.every(e=>!e.labelSource&&!e.labelTarget));
+const participants=current().edges,card=edgeId=>document.querySelector(`[data-participant-cardinality="${edgeId}"]`),participation=edgeId=>document.querySelector(`[data-participant-total="${edgeId}"]`);
+card(participants[0].id).value='1';card(participants[0].id).onchange();card(participants[1].id).value='N';card(participants[1].id).onchange();participation(participants[0].id).value='total';participation(participants[0].id).onchange();
+let configured=current();assert.equal(configured.edges[0].labelSource,'');assert.equal(configured.edges[0].labelTarget,'1');assert.equal(configured.edges[0].totalTarget,true);assert.equal(configured.edges[1].labelSource,'N');assert.equal(!!(configured.edges[1].totalSource||configured.edges[1].totalTarget),false);
+assert.equal(document.querySelectorAll('#graph text[font-size="19"]').length,2);
+document.getElementById('undoBtn').click();document.querySelector(`[data-outline="${relationship.id}"]`).click();assert.equal(participation(participants[0].id).value,'partial');document.getElementById('redoBtn').click();document.querySelector(`[data-outline="${relationship.id}"]`).click();assert.equal(participation(participants[0].id).value,'total');
+// Connections retain routing controls and a direct link to the relationship settings.
+const event=new window.Event('keydown',{bubbles:true});Object.assign(event,{key:'v',code:'KeyV'});canvas.dispatchEvent(event);
+fire(document.querySelector(`[data-edge="${participants[0].id}"] path`),'pointerdown',0,0);assert.ok(document.getElementById('routeType'));assert.equal(document.querySelector('[data-side]'),null);assert.equal(document.querySelector('[data-participant-cardinality]'),null);document.getElementById('editRelationship').click();assert.equal(document.querySelectorAll('[data-participant]').length,2);assert.equal(participation(participants[0].id).value,'total');
+const ids=[...document.querySelectorAll('[id]')].map(n=>n.id);assert.equal(new Set(ids).size,ids.length);
+assert.equal(saved.size>0,true);});

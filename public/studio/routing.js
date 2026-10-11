@@ -1,0 +1,18 @@
+const cache=new Map();
+export function intersects(a,b,r){const x0=Math.min(a.x,b.x),x1=Math.max(a.x,b.x),y0=Math.min(a.y,b.y),y1=Math.max(a.y,b.y);if(a.x===b.x)return a.x>r.l&&a.x<r.r&&y1>r.t&&y0<r.b;if(a.y===b.y)return a.y>r.t&&a.y<r.b&&x1>r.l&&x0<r.r;let lo=0,hi=1;for(const [p,q] of [[-(b.x-a.x),a.x-r.l],[b.x-a.x,r.r-a.x],[-(b.y-a.y),a.y-r.t],[b.y-a.y,r.b-a.y]]){if(!p){if(q<0)return false;continue;}const t=q/p;if(p<0)lo=Math.max(lo,t);else hi=Math.min(hi,t);if(lo>hi)return false;}return true;}
+const simplify=points=>points.filter((p,i,a)=>!i||i===a.length-1||!((a[i-1].x===p.x&&p.x===a[i+1].x)||(a[i-1].y===p.y&&p.y===a[i+1].y)));
+export function route(e,nodes,size,boundary){const a=nodes.find(n=>n.id===e.source),b=nodes.find(n=>n.id===e.target);if(!a||!b)return [];
+ if(e.points?.length)return [boundary(a,e.points[0]),...e.points,boundary(b,e.points.at(-1))];
+ // Attribute spokes may pass behind other shapes. Detouring each spoke around
+ // nearby attributes merges unrelated connections into the same stepped route.
+ if(e.routing!=='orthogonal'||a.type==='attribute'||b.type==='attribute')return [boundary(a,b),boundary(b,a)];
+ const signature=JSON.stringify([e.source,e.target,nodes.map(n=>[n.id,n.x,n.y,n.name,n.type])]);if(cache.has(signature))return cache.get(signature);
+ const obstacles=nodes.filter(n=>n!==a&&n!==b).map(n=>{const s=size(n);return {l:n.x-s.w/2-18,r:n.x+s.w/2+18,t:n.y-s.h/2-18,b:n.y+s.h/2+18};});
+ const clear=(p,q)=>!obstacles.some(r=>intersects(p,q,r));
+ const xs=[a.x,b.x],ys=[a.y,b.y];const near=obstacles.filter(r=>r.r>=Math.min(a.x,b.x)-350&&r.l<=Math.max(a.x,b.x)+350&&r.b>=Math.min(a.y,b.y)-350&&r.t<=Math.max(a.y,b.y)+350).slice(0,70);for(const r of near){xs.push(r.l,r.r);ys.push(r.t,r.b);}const X=[...new Set(xs)].sort((a,b)=>a-b),Y=[...new Set(ys)].sort((a,b)=>a-b),start=Y.indexOf(a.y)*X.length+X.indexOf(a.x),end=Y.indexOf(b.y)*X.length+X.indexOf(b.x),get=i=>({x:X[i%X.length],y:Y[Math.floor(i/X.length)]}),dist=new Map([[start,0]]),prev=new Map(),open=new Set([start]);
+ let found=false,steps=0;while(open.size&&steps++<25000){let current=-1,best=Infinity;for(const i of open){const p=get(i),score=dist.get(i)+Math.abs(p.x-b.x)+Math.abs(p.y-b.y);if(score<best){best=score;current=i;}}if(current===end){found=true;break;}open.delete(current);const cx=current%X.length,cy=Math.floor(current/X.length);for(const j of [cx?current-1:-1,cx<X.length-1?current+1:-1,cy?current-X.length:-1,cy<Y.length-1?current+X.length:-1]){if(j<0)continue;const p=get(current),q=get(j);if(!clear(p,q))continue;const d=dist.get(current)+Math.abs(p.x-q.x)+Math.abs(p.y-q.y)+.01;if(d<(dist.get(j)??Infinity)){dist.set(j,d);prev.set(j,current);open.add(j);}}}
+ let points;if(found){points=[get(end)];let i=end;while(i!==start){i=prev.get(i);points.unshift(get(i));}points=simplify(points);if(points.length>1){points[0]=boundary(a,points[1]);points[points.length-1]=boundary(b,points.at(-2));}}else points=[boundary(a,b),boundary(b,a)];
+ if(cache.size>1000)cache.clear();cache.set(signature,points);return points;
+}
+export function offsetRoute(points,d){return points.map((p,i)=>{const a=points[Math.max(0,i-1)],b=points[Math.min(points.length-1,i+1)],before=i?{x:p.x-a.x,y:p.y-a.y}:{x:b.x-p.x,y:b.y-p.y},after=i<points.length-1?{x:b.x-p.x,y:b.y-p.y}:before;const l=Math.hypot(before.x,before.y)||1,m=Math.hypot(after.x,after.y)||1,n1={x:-before.y/l,y:before.x/l},n2={x:-after.y/m,y:after.x/m},den=1+n1.x*n2.x+n1.y*n2.y;return {x:p.x+d*(n1.x+n2.x)/Math.max(.25,den),y:p.y+d*(n1.y+n2.y)/Math.max(.25,den)};});}
+export const pathData=p=>p.map((v,i)=>(i?'L':'M')+v.x+' '+v.y).join('');
