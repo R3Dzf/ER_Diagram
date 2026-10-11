@@ -1,6 +1,6 @@
 import {size} from './core.js';
 import {intersects} from './routing.js';
-import {crowSize,attached} from './crowfoot.js';
+import {crowSize,attached,crowProjection} from './crowfoot.js';
 
 function adjacency(model){
  const graph=new Map(model.nodes.map(n=>[n.id,[]])),byId=new Map(model.nodes.map(n=>[n.id,n]));
@@ -28,6 +28,7 @@ export function moveGroup(model,before,ids,dx,dy){
 // reserves the actual dimensions of its descendants, including composite nodes.
 export function autoLayout(model){
  if(!model.nodes.length)return;
+ if(model.notation==='crowfoot'){layoutCrow(model);return;}
  const {graph,byId}=adjacency(model),major=model.nodes.filter(n=>n.type!=='attribute'),roots=[],seen=new Set(),children=new Map(model.nodes.map(n=>[n.id,[]]));
  // Keep connected major elements near each other rather than using creation order.
  for(const n of major)if(!seen.has(n.id)){const queue=[n.id];seen.add(n.id);for(let i=0;i<queue.length;i++){const id=queue[i];roots.push(id);for(const next of graph.get(id))if(byId.get(next).type!=='attribute'&&!seen.has(next)){seen.add(next);queue.push(next);}}}
@@ -182,4 +183,19 @@ function topologyPlan(entities,neighbors,panel){
   pitchX*=1.15;pitchY*=1.15;
  }
  return null;
+}
+
+// Pack the visible cards, preserving hidden Chen attribute coordinates relative
+// to their owner. Collapsed relationships do not consume empty grid cells.
+function layoutCrow(model){
+ const {cards,links}=crowProjection(model);if(!cards.length)return;
+ const graph=new Map(cards.map(n=>[n.id,new Set()])),byId=new Map(model.nodes.map(n=>[n.id,n]));
+ for(const e of links){graph.get(e.source)?.add(e.target);graph.get(e.target)?.add(e.source);}
+ const ordered=[],seen=new Set();for(const n of [...cards].sort((a,b)=>graph.get(a.id).size-graph.get(b.id).size)){if(seen.has(n.id))continue;const queue=[n.id];seen.add(n.id);for(let i=0;i<queue.length;i++){ordered.push(cards.find(n=>n.id===queue[i]));for(const id of graph.get(queue[i]))if(!seen.has(id)){seen.add(id);queue.push(id);}}}
+ const cols=Math.min(4,Math.ceil(Math.sqrt(cards.length))),widths=Array(cols).fill(0),heights=Array(Math.ceil(cards.length/cols)).fill(0);
+ ordered.forEach((n,i)=>{const s=crowSize(n);widths[i%cols]=Math.max(widths[i%cols],s.w);heights[Math.floor(i/cols)]=Math.max(heights[Math.floor(i/cols)],s.h);});
+ const starts=values=>{let at=0;return values.map(v=>{const x=at;at+=v+180;return x;});},xs=starts(widths),ys=starts(heights),w=xs.at(-1)+widths.at(-1),h=ys.at(-1)+heights.at(-1),before=JSON.parse(JSON.stringify(model));
+ ordered.forEach((card,i)=>{const n=byId.get(card.id),x=xs[i%cols]+widths[i%cols]/2-w/2,y=ys[Math.floor(i/cols)]+heights[Math.floor(i/cols)]/2-h/2;moveGroup(model,before,movementGroup(model,[n.id]),x-n.x,y-n.y);});
+ const visible=new Set(cards.map(n=>n.id));for(const r of model.nodes.filter(n=>n.type==='relationship'&&!visible.has(n.id))){const ps=model.edges.filter(e=>e.source===r.id||e.target===r.id).map(e=>byId.get(e.source===r.id?e.target:e.source)).filter(n=>n?.type==='entity');if(ps.length){r.x=ps.reduce((s,n)=>s+n.x,0)/ps.length;r.y=ps.reduce((s,n)=>s+n.y,0)/ps.length;}}
+ for(const e of model.edges){e.points=[];e.routing='orthogonal';}
 }

@@ -68,7 +68,7 @@ Use **Validate** to list available checks and jump to affected elements. Resolve
 
 ## Switch notation
 
-Choose Chen or Crow’s Foot from the notation selector. Both render the same conceptual model. Crow’s Foot shows entity attributes as rows and relationship endpoint markers. Relationships with attributes or multiple participants can appear as association boxes. Select the relationship through Outline to edit its rules.
+Choose Chen or Crow’s Foot from the notation selector. Both render the same conceptual model. Crow’s Foot shows entity attributes as rows and relationship endpoint markers. Relationships with attributes or multiple participants can appear as association boxes. Click a relationship name or use Outline to edit its rules. Attribute rows open their properties without moving hidden Chen coordinates. PK, PART, SET, and FX badges identify primary keys, partial keys, multivalued attributes, and derived attributes. A question mark means the cardinality has not been set. Auto Layout reserves space for the visible cards, while keeping attributes attached to their owners.
 
 ## Save and organize
 
@@ -103,7 +103,9 @@ A read-only share link and a collaborator invitation serve different purposes: t
 
 Image and PDF exports include the whole diagram, not just the visible viewport. Export appearance is independent of Light/Dark/System UI theme. PDF uses an opaque background. Large PNGs are bounded to avoid excessive memory use; tiled PDFs have a page limit.
 
-**Generate SQL** produces PostgreSQL text with warnings about assumptions. Review it before running it against a real database.
+**Generate SQL** opens Schema studio. Choose PostgreSQL, MySQL 8.0.16+, or SQLite, then inspect **SQL code** or **Tables & relationships**. Foreign key indexes can be included, and PostgreSQL/SQLite exports can be wrapped in a transaction. Expand the mapping review for assumptions and use **Locate** to select an affected diagram element. Copy or download the export; the preview never runs SQL against your account database.
+
+Composite and multivalued attributes, weak ownership chains, recursive roles, binary and multi-entity relationships have explicit mapping rules. Some minimum participation rules still require application logic or database-specific triggers. Generated IDs need values or identity configuration. See [SQL generation](SQL_GENERATION.md) for the full behavior and limitations.
 
 ## Install and work offline
 

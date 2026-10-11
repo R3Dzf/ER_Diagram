@@ -23,7 +23,9 @@ flowchart TD
 | --- | --- |
 | `app.js` | Editor/dashboard state, live naming, selection, history, dialogs, account initialization, import/export and onboarding |
 | `core.js` | Model validation, shape sizes/boundaries, Chen SVG, export geometry and shared helpers |
-| `crowfoot.js` | Crow’s Foot cards and associations |
+| `model-attributes.js` | Rooted attribute traversal, inherited flags, and supported SQL types |
+| `sql-preview.js` | Schema studio controls, syntax highlighting, table previews, and mapping review |
+| `crowfoot.js` | Crow’s Foot cards, association views, endpoint markers, parallel lanes, and recursive loops |
 | `relationship-tools.js` | Participant lookup and consistent cardinality/participation updates |
 | `design-tools.js`, `layout.js` | Group operations, layout, guides and validation |
 | `routing.js`, `label-layout.js` | Connection routing, geometry and label placement |
@@ -32,7 +34,7 @@ flowchart TD
 | `cloud.js`, `offline.js` | Autosave queue, revision checks, cache validation and reconnection |
 | `merge.js` | Three-way comparison/merge of models and conflict detection |
 | `collaboration.js` | Invitations, members, comments, presence, polling and remote updates |
-| `vector-pdf.js`, `sql.js` | Vector PDF with embedded fonts; PostgreSQL generation |
+| `vector-pdf.js`, `sql.js` | Vector PDF with embedded fonts; dialect-specific relational SQL generation |
 | `theme.js`, `pwa.js`, `notifications.js` | Appearance, install/update lifecycle, and notifications visible above dialogs |
 | `presets.js`, `icons.js` | Editable templates and interface icons |
 

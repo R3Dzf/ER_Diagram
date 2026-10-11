@@ -35,7 +35,7 @@ Guest diagrams save on the current device. Signed-in users get private account w
 | Lines and layout | Connections render behind shapes; straight/orthogonal routing, draggable bends, and deterministic, undoable auto layout |
 | Notation | Chen and Crow’s Foot views share one underlying conceptual model |
 | Validation | Locate issues such as missing keys, incomplete relationships, disconnected elements, and shape-crossing connections |
-| SQL | PostgreSQL preview, copy, and download, with warnings for assumptions requiring review |
+| SQL | Schema studio for PostgreSQL, MySQL 8.0.16+, and SQLite, with table previews, mapping notes, indexes, and review warnings |
 | Export | Whole-diagram PNG/SVG, light/dark export appearance, optional PNG/SVG transparency, vector PDF with embedded fonts, A4/A3, orientation, and tiled pages |
 | Accounts | Host-provided ChatGPT sign-in and optional Google sign-in/linking; private projects per account |
 | Saving | Device autosave, cloud revision checks, account-specific offline caches, conflict recovery copies, and up to 50 versions per diagram |

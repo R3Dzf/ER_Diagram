@@ -148,3 +148,11 @@
 
 [data-theme="dark"] .version-preview{background:#151e29;border-color:var(--border)}
 [data-theme="dark"] input:disabled,[data-theme="dark"] select:disabled{opacity:.8;color:var(--dark-soft)}
+[data-theme="dark"] :is(#graph,.card-preview,.version-preview) [fill="#f1f5f9"]{fill:#111b29}
+[data-theme="dark"] :is(#graph,.card-preview,.version-preview) [fill="#f8fafc"]{fill:#1c2737}
+[data-theme="dark"] :is(#graph,.card-preview,.version-preview) [fill="#eaf6ff"]{fill:#24394c}
+[data-theme="dark"] :is(#graph,.card-preview,.version-preview) [fill="#f1edff"]{fill:#3a304f}
+[data-theme="dark"] .sql-tabs button.active,[data-theme="dark"] .sql-locate{color:#b7c9ff}
+[data-theme="dark"] .sql-severity{background:#3a3023;color:#efc780}
+[data-theme="dark"] .sql-diagnostic.info .sql-severity,[data-theme="dark"] .sql-badge{background:#24394c;color:#a8d8e8}
+[data-theme="dark"] .sql-badge.foreign{background:#3a304f;color:#cab5f2}

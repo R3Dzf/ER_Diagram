@@ -6,7 +6,7 @@ export function route(e,nodes,size,boundary){const a=nodes.find(n=>n.id===e.sour
  // Attribute spokes may pass behind other shapes. Detouring each spoke around
  // nearby attributes merges unrelated connections into the same stepped route.
  if(e.routing!=='orthogonal'||a.type==='attribute'||b.type==='attribute')return [boundary(a,b),boundary(b,a)];
- const signature=JSON.stringify([e.source,e.target,nodes.map(n=>[n.id,n.x,n.y,n.name,n.type])]);if(cache.has(signature))return cache.get(signature);
+ const signature=JSON.stringify([e.source,e.target,nodes.map(n=>[n.id,n.x,n.y,n.name,n.type,size(n).w,size(n).h])]);if(cache.has(signature))return cache.get(signature);
  const obstacles=nodes.filter(n=>n!==a&&n!==b).map(n=>{const s=size(n);return {l:n.x-s.w/2-18,r:n.x+s.w/2+18,t:n.y-s.h/2-18,b:n.y+s.h/2+18};});
  const clear=(p,q)=>!obstacles.some(r=>intersects(p,q,r));
  const xs=[a.x,b.x],ys=[a.y,b.y];const near=obstacles.filter(r=>r.r>=Math.min(a.x,b.x)-350&&r.l<=Math.max(a.x,b.x)+350&&r.b>=Math.min(a.y,b.y)-350&&r.t<=Math.max(a.y,b.y)+350).slice(0,70);for(const r of near){xs.push(r.l,r.r);ys.push(r.t,r.b);}const X=[...new Set(xs)].sort((a,b)=>a-b),Y=[...new Set(ys)].sort((a,b)=>a-b),start=Y.indexOf(a.y)*X.length+X.indexOf(a.x),end=Y.indexOf(b.y)*X.length+X.indexOf(b.x),get=i=>({x:X[i%X.length],y:Y[Math.floor(i/X.length)]}),dist=new Map([[start,0]]),prev=new Map(),open=new Set([start]);
