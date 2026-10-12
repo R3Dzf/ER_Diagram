@@ -54,7 +54,7 @@ test("editor trims redundant explanations and exposes concise actions", () => {
  assert.match(html,/>History<\/button>/);
  const css=contents("public/studio/ux-refinements.css");
  assert.match(css,/\.inspector \.inspector-tips\{display:none\}/);
- assert.match(css,/\.palette \.shape-tools small\{display:none\}/);
+ assert.ok(css.includes('.palette .shape-tools small,.palette .connect-tool small{display:none}'));
 });
 test("history sync uses the same /studio/ route without disrupting share hashes", () => {
  const app=contents("public/studio/app.js");
