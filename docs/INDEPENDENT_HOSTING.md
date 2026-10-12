@@ -8,6 +8,25 @@ ChatGPT Sites injects trusted `oai-authenticated-user-*` headers behind its own 
 
 The standalone editor works in guest/local-device mode without Google configuration. Cloud synchronization, account sharing and collaboration require a configured Google Web application client.
 
+## Browser-only deployment from GitHub Actions (recommended)
+
+No local downloads are needed. This branch includes `.github/workflows/deploy-cloudflare-staging.yml`; it is disabled unless explicitly enabled.
+
+1. Sign in to https://dash.cloudflare.com/ and create a **new** D1 SQL database named `bosha-studio`. Record its database UUID.
+2. Create a Cloudflare API token scoped to your account, with Workers Scripts Edit and D1 Edit permissions, using https://dash.cloudflare.com/profile/api-tokens. Never put the token in a GitHub issue, source file, or chat.
+3. In https://github.com/R3Dzf/ER_Diagram/settings/secrets/actions create these **repository secrets**:
+   - `CLOUDFLARE_ACCOUNT_ID`: account ID from Cloudflare dashboard.
+   - `CLOUDFLARE_API_TOKEN`: restricted API token, kept secret.
+   - `CLOUDFLARE_D1_DATABASE_ID`: UUID of the **new**, isolated `bosha-studio` database.
+   - Optional `BOSHA_GOOGLE_CLIENT_ID`: a separate Google OAuth Web application client ID with the new Workers URL added as an authorized JavaScript origin.
+4. In https://github.com/R3Dzf/ER_Diagram/settings/variables/actions add a **repository variable** `BOSHA_STAGING_DEPLOY` set to `true` only when you are ready to deploy.
+5. Push a fresh commit to `deploy/independent-cloudflare-20261012`. That branch alone triggers the **Deploy standalone Cloudflare staging** workflow; it tests, applies D1 migrations, builds, and deploys. This automation does not run on `main`.
+6. Read the workflow results to find the published `workers.dev` URL and verify account, data and editor behavior. Disable the variable to stop further automatic deployments.
+
+The branch's ordinary CI continues to test the build without contacting Cloudflare. The staging deployment workflow is opt-in and skips itself until the repository variable is enabled.
+
+Important: Signing into Cloudflare with a Google account does **not** automatically configure Google login for Bosha Studio. You still need a Google Cloud OAuth Web application client ID for cross-device account features.
+
 ## Set up a new, isolated environment
 
 1. Create a free Cloudflare account at https://dash.cloudflare.com/ and enable a Workers subdomain. Use **this staging branch**, not `main`.
