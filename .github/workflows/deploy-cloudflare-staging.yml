@@ -75,6 +75,24 @@ jobs:
         if: steps.gate.outputs.ready == 'true'
         run: node .github/scripts/verify-deployment.mjs
 
+      - name: Install isolated browser QA
+        if: steps.gate.outputs.ready == 'true'
+        run: |
+          npm install --prefix /tmp/bosha-browser-qa --no-save --ignore-scripts playwright@1.56.1
+          /tmp/bosha-browser-qa/node_modules/.bin/playwright install --with-deps chromium
+
+      - name: Test live responsive design after deployment
+        if: steps.gate.outputs.ready == 'true'
+        run: node .github/scripts/responsive-qa.cjs
+
+      - name: Save browser QA screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: deployed-responsive-qa
+          path: qa-artifacts/
+          retention-days: 7
+
       - name: Publish next-step instructions
         if: steps.gate.outputs.ready == 'true'
         run: |

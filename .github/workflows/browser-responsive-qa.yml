@@ -1,8 +1,6 @@
 name: Browser responsive QA
 
 on:
-  push:
-    branches: [deploy/independent-cloudflare-20261012]
   workflow_dispatch:
 
 permissions:
