@@ -1,0 +1,57 @@
+name: Verify live ER Diagram authentication API
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-google-auth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify deployed account configuration and guest isolation
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+
+          const origin = 'https://er-diagram.r3dzf-studio.workers.dev';
+          const get = async (path, init) => {
+            const res = await fetch(origin + path, {...init, signal: AbortSignal.timeout(15000)});
+            assert.equal(res.status, 200, path + ': HTTP ' + res.status);
+            return res;
+          };
+
+          const homepage = await get('/');
+          assert.match(await homepage.text(), /Bosha Studio|BoshaStudio|ER Diagram|studio/i);
+
+          const configuration = await (await get('/api/auth/google')).json();
+          assert.equal(configuration.configured, true, 'Google Client ID is not configured on the Worker');
+          assert.match(configuration.clientId, /^[0-9]+-[A-Za-z0-9_-]+\.apps\.googleusercontent\.com$/);
+          assert.equal(configuration.user, null);
+
+          const guestResponse = await get('/api/workspace', {
+            headers: {
+              'oai-authenticated-user-id': 'forged-user',
+              'oai-authenticated-user-email': 'forged@example.test',
+            }
+          });
+          const guest = await guestResponse.json();
+          assert.equal(guest.user, null, 'Site-native identity spoofing is possible');
+          assert.deepEqual(guest.projects, []);
+
+          const nonceResponse = await get('/api/auth/google/nonce', {
+            method: 'POST',
+            headers: {'Origin': origin, 'Content-Type':'application/json'},
+            body: JSON.stringify({link:false})
+          });
+          const nonce = await nonceResponse.json();
+          assert.match(nonce.nonce, /^[A-Za-z0-9_-]{43}$/);
+          assert.match(nonceResponse.headers.get('set-cookie')||'', /__Host-bosha_google_nonce=/);
+
+          console.log('Live homepage, D1 nonce, Google OAuth client configuration, and forged-identity protections passed.');
+          console.log('OAuth popup and Google Authorized JavaScript origins still require a real browser sign-in test.');
+          NODE
