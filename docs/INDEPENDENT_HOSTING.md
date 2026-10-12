@@ -10,22 +10,17 @@ The standalone editor works in guest/local-device mode without Google configurat
 
 ## Browser-only deployment from GitHub Actions (recommended)
 
-No local downloads are needed. This branch includes `.github/workflows/deploy-cloudflare-staging.yml`; it is disabled unless explicitly enabled.
+The Cloudflare account is already connected, its free Workers subdomain is `r3dzf-studio.workers.dev`, and the **new staging** D1 database `bosha-studio` exists with ID `0022588d-62ab-4765-8ccf-294c7d00e2e4`. The account ID is `6411cac8f04e7bc98a84aeac63fcebef`. These are resource identifiers, **not** authentication credentials.
 
-1. Sign in to https://dash.cloudflare.com/ and create a **new** D1 SQL database named `bosha-studio`. Record its database UUID.
-2. Create a **custom** Cloudflare API token scoped only to your account through the Cloudflare dashboard's **Account API tokens** page. To create the initial Worker the token needs **Workers Admin** (account/product scope); to apply the database migrations it also needs **D1 Editor**. After first deployment you can replace this token with a narrower deployment token if desired. Never put the token in a GitHub issue, source file, or chat. Cloudflare's permissions UI may display these as the corresponding product roles.
-3. In https://github.com/R3Dzf/ER_Diagram/settings/secrets/actions create these **repository secrets**:
-   - `CLOUDFLARE_ACCOUNT_ID`: account ID from Cloudflare dashboard.
-   - `CLOUDFLARE_API_TOKEN`: restricted API token, kept secret.
-   - `CLOUDFLARE_D1_DATABASE_ID`: UUID of the **new**, isolated `bosha-studio` database.
-   - Optional `BOSHA_GOOGLE_CLIENT_ID`: a separate Google OAuth Web application client ID with the new Workers URL added as an authorized JavaScript origin.
-4. In https://github.com/R3Dzf/ER_Diagram/settings/variables/actions add a **repository variable** `BOSHA_STAGING_DEPLOY` set to `true` only when you are ready to deploy.
-5. Push a fresh commit to `deploy/independent-cloudflare-20261012`. That branch alone triggers the **Deploy standalone Cloudflare staging** workflow; it tests, applies D1 migrations, builds, and deploys. This automation does not run on `main`.
-6. Read the workflow results to find the published `workers.dev` URL and verify account, data and editor behavior. Disable the variable to stop further automatic deployments.
+Only **one GitHub Actions secret** is required to launch the isolated staging Worker:
 
-The branch's ordinary CI continues to test the build without contacting Cloudflare. The staging deployment workflow is opt-in and skips itself until the repository variable is enabled.
+1. In your Cloudflare dashboard, create a restricted **account-scoped API token** with **Workers Admin** at the Workers product scope (needed to create the first Worker) and **D1 Editor** for the staging database or D1 product (needed for migrations). Restrict the token to this Cloudflare account. Never paste the token into commits, chats, issues, or logs.
+2. Open https://github.com/R3Dzf/ER_Diagram/settings/secrets/actions and create a repository secret named `CLOUDFLARE_API_TOKEN`; paste the value there.
+3. Trigger a fresh commit/push **only** to `deploy/independent-cloudflare-20261012`. That branch's `.github/workflows/deploy-cloudflare-staging.yml` will automatically run tests, apply schema migrations to this staging D1, build, and deploy `bosha-studio`. If the secret is absent, deployment steps skip safely. No variable or other secret is required for a guest-mode deployment.
+4. Check GitHub Actions and the new `https://bosha-studio.r3dzf-studio.workers.dev` URL after successful deployment. Never assume it is live until verified. Set up the separate Google OAuth application in Google Cloud for account-based cloud sync; the optional `BOSHA_GOOGLE_CLIENT_ID` GitHub secret is available once the exact origin has been authorized.
+5. Once the first Worker exists, reduce the API token's Worker scope to Editor for only this Worker where supported, retaining D1 Editor for future schema migrations.
 
-Important: Signing into Cloudflare with a Google account does **not** automatically configure Google login for Bosha Studio. You still need a Google Cloud OAuth Web application client ID for cross-device account features.
+The old ChatGPT Site, its D1 database, and `main` are never targeted by this workflow. Keep the old site live until user data export/import and end-to-end tests are complete.
 
 ## Set up a new, isolated environment
 
