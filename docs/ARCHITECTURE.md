@@ -105,4 +105,4 @@ New shell versions wait for user activation. Reload permission considers save fa
 
 ## Host trust boundary
 
-Sites supplies authenticated user headers through its trusted gateway. Those headers are **not bearer credentials** and must not be accepted directly from the public internet when hosting elsewhere. Google sessions are resolved from verified, hashed server-side tokens. See [deployment](DEPLOYMENT.md) and [security](../SECURITY.md).
+The previous hosting environment supplied signed-in identities through an internal gateway. Such headers are **not bearer credentials** and must not be accepted directly from the public internet when hosting elsewhere. Google sessions are resolved from verified, hashed server-side tokens. See [deployment](DEPLOYMENT.md) and [security](../SECURITY.md).

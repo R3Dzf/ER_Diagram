@@ -14,7 +14,7 @@ pnpm run dev
 
 Open `http://localhost:5173/studio/`. The root route redirects there. Windows users can use the same pnpm commands. Python’s static server is an alternative for guest-only editor development; see the README.
 
-A clean clone selects the **portable** execution profile. The managed Sites environment can select a profile in ignored `.sites-runtime/execution-profile.json`; never commit that machine-specific state.
+A clean clone selects the **portable** execution profile. The managed development environment can select a profile in ignored `local runtime directory/execution-profile.json`; never commit that machine-specific state.
 
 ## Local database
 
@@ -36,7 +36,7 @@ Review both SQL and Drizzle metadata. Commit them together, apply locally, and r
 
 ## Authentication during development
 
-The Sites Vite plugin provides a mock ChatGPT sign-in on loopback-only development servers. Its identity is a development fixture, not the real user’s ChatGPT account. Production builds exclude that mock server hook.
+The local development plugin provides a mock local sign-in on loopback-only development servers. Its identity is a development fixture, not the real user’s account. Production builds exclude that mock server hook.
 
 The public static editor has no backend identity. Google is optional and uses a runtime `GOOGLE_CLIENT_ID`; do not hard-code tokens or private secrets into browser files. See [deployment](DEPLOYMENT.md) for its HTTPS and authorized-origin requirements.
 
