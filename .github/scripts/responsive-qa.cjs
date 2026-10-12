@@ -6,6 +6,8 @@ const sizes = [
   {name:'phone-small', width:320, height:700},
   {name:'phone', width:390, height:844},
   {name:'tablet', width:768, height:1024},
+  {name:'tablet-wide', width:1024, height:768},
+  {name:'small-laptop', width:1180, height:790},
   {name:'desktop', width:1440, height:900},
 ];
 (async()=>{
@@ -37,7 +39,7 @@ const sizes = [
       assert.equal(await crow.getAttribute('aria-pressed'),'true','Crow foot switch must activate');
       await chen.click();
       assert.equal(await chen.getAttribute('aria-pressed'),'true','Chen switch must activate');
-      if(device.width<=760){
+      if(device.width<=1300){
         const more=page.locator('#mobileMoreBtn');
         assert.equal(await more.isVisible(),true,'Mobile more-actions button missing');
         await more.click();

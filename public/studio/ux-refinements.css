@@ -126,3 +126,31 @@ button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{ou
  .mobile-more-toggle{min-width:40px}
 }
 @media(prefers-reduced-motion:reduce){.header-google-signin,.notation-segments button,.rail-account .avatar{transition:none}}
+
+
+/* Keep the desktop header from squeezing breadcrumb labels into action buttons. */
+.header #saveState{display:none!important}
+.header .breadcrumb{overflow:hidden;max-width:165px}
+.header .breadcrumb>span{overflow:hidden;text-overflow:ellipsis}
+.header .breadcrumb input{width:142px;min-width:0;max-width:142px}
+@media(max-width:1600px){.header .brand-tag{display:none}}
+/* Tablet and compact laptop: move secondary actions into the accessible More menu. */
+@media(max-width:1300px){
+ .header .breadcrumb{display:none}
+ .header #installAppBtn,.header #themeBtn,.header #openBtn,.header #saveBtn,.header #shareBtn,.header #collaborateBtn,.header #welcomeAccount{display:none!important}
+ .header-actions{margin-left:auto;gap:7px}
+ .header-google-signin .signin-label{display:none}
+ .header-google-signin .signin-compact{display:inline}
+ .mobile-more-toggle{display:inline-flex!important;align-items:center;justify-content:center;gap:5px;min-height:40px;min-width:63px;padding:8px 10px!important;border:1px solid var(--ux-border);border-radius:10px;font-size:12px!important}
+ .mobile-more-menu:not([hidden]){display:flex;flex-direction:column;position:absolute;top:74px;right:12px;z-index:45;min-width:220px;max-width:calc(100vw - 25px);padding:7px;border-radius:13px;border:1px solid var(--ux-border);background:var(--panel);box-shadow:0 16px 36px #0f172a29}
+ .mobile-more-menu>button{display:flex;align-items:center;gap:11px;text-align:left;width:100%;min-height:44px;padding:11px 13px;font-size:13px;color:var(--ink);border-radius:9px}
+ .mobile-more-menu>button:hover,.mobile-more-menu>button:focus-visible{background:var(--dark-raised,#eef2ff)}
+}
+@media(max-width:1100px){
+ .pro-toolbar{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;gap:6px}
+ .pro-toolbar>button{flex-shrink:0;min-height:38px}
+ .pro-toolbar #teamSummary{display:none}
+}
+@media(max-width:760px){
+ .mobile-more-menu:not([hidden]){top:60px;right:8px;max-width:calc(100vw - 70px)}
+}

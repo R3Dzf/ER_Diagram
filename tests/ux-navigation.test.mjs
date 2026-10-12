@@ -15,7 +15,7 @@ test("guest sign-in is discoverable, accessible, and separate from account manag
   assert.ok(document.querySelector("#accountBtn"));
   assert.ok(document.querySelector("#mobileMoreBtn[aria-expanded='false']"));
   assert.ok(document.querySelector("#mobileMoreMenu[hidden]"));
-  for (const action of ["import", "appearance", "install", "account"]) {
+  for (const action of ["import", "save", "share", "collaborate", "appearance", "install", "account"]) {
     assert.ok(document.querySelector(`[data-mobile-action="${action}"]`));
   }
 });
