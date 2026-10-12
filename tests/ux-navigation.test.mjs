@@ -64,3 +64,16 @@ test("history sync uses the same /studio/ route without disrupting share hashes"
  assert.match(app,/url\.searchParams\.set\('view','templates'\)/);
  assert.match(app,/url\.pathname\+url\.search\+url\.hash/);
 });
+
+test("dark palette raises canvas and diagram contrast without changing exported SVG", () => {
+ const html=contents("public/studio/index.html");
+ const css=contents("public/studio/dark-contrast.css");
+ const links=[...parseHTML(html).document.querySelectorAll('link[rel="stylesheet"]')].map(x=>x.getAttribute('href'));
+ assert.ok(links.indexOf('dark-contrast.css')>links.indexOf('ux-refinements.css'));
+ assert.match(css,/data-theme="dark"\] \.canvas-wrap\{background:#30455e\}/);
+ assert.match(css,/data-theme="dark"\] #graph \[data-kind="entity"\]>g\{fill:#496f95;stroke:#d1e3f5\}/);
+ assert.match(css,/data-theme="dark"\] #graph \[stroke="#486071"\]\{stroke:#c7d8eb\}/);
+ assert.match(css,/data-theme="dark"\] #graph \[data-crow-card\]>rect/);
+ const sw=contents("public/sw.js");
+ assert.ok(sw.includes("/studio/dark-contrast.css"));
+});

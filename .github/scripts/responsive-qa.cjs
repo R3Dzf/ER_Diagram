@@ -58,6 +58,28 @@ const sizes = [
         assert.equal(await page.locator('#mobileMoreMenu').isVisible(),false,'Escape did not close mobile menu');
       }
       await page.screenshot({path:`qa-artifacts/${device.name}-editor.png`,fullPage:true});
+      // Verify actual dark canvas and diagram colors in Chromium, not just CSS text.
+      const addEntity = page.locator('.canvas-toolbar [data-add="entity"]');
+      await addEntity.click();
+      await page.evaluate(() => localStorage.setItem('bosha-theme','dark'));
+      await page.reload({waitUntil:'domcontentloaded'});
+      await page.locator('#editor').waitFor({state:'visible',timeout:16000});
+      const themeCheck=await page.evaluate(()=>{
+        const node=document.querySelector('#graph [data-kind="entity"]>g');
+        const canvas=document.querySelector('.canvas-wrap');
+        if(!node||!canvas)throw new Error('Expected a visible diagram element');
+        return {
+          mode:document.documentElement.dataset.theme,
+          canvas:getComputedStyle(canvas).backgroundColor,
+          shape:getComputedStyle(node).fill,
+          outline:getComputedStyle(node).stroke
+        };
+      });
+      assert.equal(themeCheck.mode,'dark');
+      assert.equal(themeCheck.canvas,'rgb(48, 69, 94)');
+      assert.equal(themeCheck.shape,'rgb(73, 111, 149)');
+      assert.equal(themeCheck.outline,'rgb(209, 227, 245)');
+      await page.screenshot({path:`qa-artifacts/${device.name}-editor-dark.png`,fullPage:true});
       const info=await page.evaluate(()=>({
         documentWidth:document.documentElement.scrollWidth,
         viewport:window.innerWidth,
