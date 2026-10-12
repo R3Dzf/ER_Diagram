@@ -14,14 +14,14 @@ concurrency:
 
 jobs:
   deploy:
-    # Opt-in only. Keeps the live ChatGPT Site and database untouched.
-    if: ${{ github.ref == 'refs/heads/deploy/independent-cloudflare-20261012' && vars.BOSHA_STAGING_DEPLOY == 'true' }}
+    # Only this isolated staging branch can deploy. If there is no GitHub API token secret, do nothing.
+    if: ${{ github.ref == 'refs/heads/deploy/independent-cloudflare-20261012' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_ACCOUNT_ID: "6411cac8f04e7bc98a84aeac63fcebef"
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      D1_DATABASE_ID: ${{ secrets.CLOUDFLARE_D1_DATABASE_ID }}
+      D1_DATABASE_ID: "0022588d-62ab-4765-8ccf-294c7d00e2e4"
       GOOGLE_CLIENT_ID: ${{ secrets.BOSHA_GOOGLE_CLIENT_ID }}
 
     steps:
@@ -35,34 +35,44 @@ jobs:
         with:
           version: 11.25.0
 
-      - name: Verify required Cloudflare credentials
+      - name: Check whether deployment is authorized
+        id: gate
         run: |
-          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::Missing CLOUDFLARE_ACCOUNT_ID secret"; exit 1; }
-          test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::Missing CLOUDFLARE_API_TOKEN secret"; exit 1; }
-          test -n "$D1_DATABASE_ID" || { echo "::error::Missing CLOUDFLARE_D1_DATABASE_ID secret"; exit 1; }
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "Cloudflare deployment is disabled. Add CLOUDFLARE_API_TOKEN as a GitHub Actions secret, then request a new staging-branch run."
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Install locked dependencies
+        if: steps.gate.outputs.ready == 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Verify source and account isolation
+        if: steps.gate.outputs.ready == 'true'
         run: |
           pnpm test
           pnpm typecheck
 
       - name: Configure isolated D1 database
+        if: steps.gate.outputs.ready == 'true'
         run: pnpm cloudflare:configure "$D1_DATABASE_ID"
 
       - name: Apply schema to isolated D1 only
+        if: steps.gate.outputs.ready == 'true'
         run: pnpm cloudflare:migrate
 
       - name: Build and deploy independent Worker
+        if: steps.gate.outputs.ready == 'true'
         run: pnpm cloudflare:deploy
 
       - name: Configure optional Google sign-in
-        if: ${{ env.GOOGLE_CLIENT_ID != '' }}
+        if: steps.gate.outputs.ready == 'true' && env.GOOGLE_CLIENT_ID != ''
         run: printf '%s' "$GOOGLE_CLIENT_ID" | pnpm exec wrangler secret put GOOGLE_CLIENT_ID --config wrangler.standalone.jsonc
 
       - name: Publish next-step instructions
+        if: steps.gate.outputs.ready == 'true'
         run: |
           echo "Cloudflare Worker bosha-studio deployed using the selected account and staging D1 database." >> "$GITHUB_STEP_SUMMARY"
           echo "Verify the workers.dev URL in the Wrangler output and test guest mode, Google sign-in, data isolation, diagram save and export." >> "$GITHUB_STEP_SUMMARY"
