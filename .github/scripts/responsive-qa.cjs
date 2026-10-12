@@ -15,7 +15,7 @@ const sizes = [
   const browser=await chromium.launch({headless:true});
   const failures=[];
   for(const device of sizes){
-    const context=await browser.newContext({viewport:{width:device.width,height:device.height},deviceScaleFactor:1,hasTouch:device.width<=768,isMobile:device.width<=390});
+    const context=await browser.newContext({viewport:{width:device.width,height:device.height},deviceScaleFactor:1,hasTouch:device.width<=768,isMobile:device.width<=390,serviceWorkers:'block'});
     const page=await context.newPage();
     const errors=[];
     page.on('pageerror',error=>errors.push(error.message));
@@ -62,8 +62,9 @@ const sizes = [
       const addEntity = page.locator('.canvas-toolbar [data-add="entity"]');
       await addEntity.click();
       await page.evaluate(() => localStorage.setItem('bosha-theme','dark'));
-      await page.reload({waitUntil:'domcontentloaded'});
+      await page.reload({waitUntil:'load'});
       await page.locator('#editor').waitFor({state:'visible',timeout:16000});
+      await page.waitForFunction(() => getComputedStyle(document.querySelector('.canvas-wrap')).backgroundColor === 'rgb(48, 69, 94)', null, {timeout:15000});
       const themeCheck=await page.evaluate(()=>{
         const node=document.querySelector('#graph [data-kind="entity"]>g');
         const canvas=document.querySelector('.canvas-wrap');
