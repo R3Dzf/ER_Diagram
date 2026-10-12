@@ -67,3 +67,6 @@ next-env.d.ts
 *.log
 !.env.example
 !.dev.vars.example
+
+# Account-specific Cloudflare Worker/D1 config: generated, never committed.
+/wrangler.standalone.jsonc

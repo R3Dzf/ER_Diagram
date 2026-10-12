@@ -1,4 +1,5 @@
 import handler from "vinext/server/fetch-handler";
+import { stripUntrustedSiteIdentityHeaders } from "../lib/standalone-security.mjs";
 import { runWithConnectorBinding } from "../lib/connector-context";
 import type { ConnectorBinding } from "../lib/connector-contract.mjs";
 
@@ -23,6 +24,8 @@ export default {
         },
       };
     }
-    return runWithConnectorBinding(binding, () => handler.fetch(request, env, ctx));
+    // The standalone Worker has no trusted Sites authentication gateway.
+    const safeRequest = stripUntrustedSiteIdentityHeaders(request);
+    return runWithConnectorBinding(binding, () => handler.fetch(safeRequest, env, ctx));
   },
 };
