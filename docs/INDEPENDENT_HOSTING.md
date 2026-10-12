@@ -13,7 +13,7 @@ The standalone editor works in guest/local-device mode without Google configurat
 No local downloads are needed. This branch includes `.github/workflows/deploy-cloudflare-staging.yml`; it is disabled unless explicitly enabled.
 
 1. Sign in to https://dash.cloudflare.com/ and create a **new** D1 SQL database named `bosha-studio`. Record its database UUID.
-2. Create a Cloudflare API token scoped to your account, with Workers Scripts Edit and D1 Edit permissions, using https://dash.cloudflare.com/profile/api-tokens. Never put the token in a GitHub issue, source file, or chat.
+2. Create a **custom** Cloudflare API token scoped only to your account through the Cloudflare dashboard's **Account API tokens** page. To create the initial Worker the token needs **Workers Admin** (account/product scope); to apply the database migrations it also needs **D1 Editor**. After first deployment you can replace this token with a narrower deployment token if desired. Never put the token in a GitHub issue, source file, or chat. Cloudflare's permissions UI may display these as the corresponding product roles.
 3. In https://github.com/R3Dzf/ER_Diagram/settings/secrets/actions create these **repository secrets**:
    - `CLOUDFLARE_ACCOUNT_ID`: account ID from Cloudflare dashboard.
    - `CLOUDFLARE_API_TOKEN`: restricted API token, kept secret.
