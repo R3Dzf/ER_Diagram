@@ -24,7 +24,7 @@ export default {
         },
       };
     }
-    // The standalone Worker has no trusted Sites authentication gateway.
+    // Only server-verified Google sessions authenticate on this Worker.
     const safeRequest = stripUntrustedSiteIdentityHeaders(request);
     return runWithConnectorBinding(binding, () => handler.fetch(safeRequest, env, ctx));
   },
