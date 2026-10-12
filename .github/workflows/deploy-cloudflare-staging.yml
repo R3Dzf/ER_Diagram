@@ -71,6 +71,10 @@ jobs:
         if: steps.gate.outputs.ready == 'true' && env.GOOGLE_CLIENT_ID != ''
         run: printf '%s' "$GOOGLE_CLIENT_ID" | pnpm exec wrangler secret put GOOGLE_CLIENT_ID --config wrangler.standalone.jsonc
 
+      - name: Smoke-test deployed website and reject forged identity
+        if: steps.gate.outputs.ready == 'true'
+        run: node .github/scripts/verify-deployment.mjs
+
       - name: Publish next-step instructions
         if: steps.gate.outputs.ready == 'true'
         run: |
