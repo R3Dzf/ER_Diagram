@@ -30,17 +30,28 @@ if (action === "migrate") {
 } else {
   invoke("./run-framework.mjs", ["build"], { ...process.env, BOSHA_STANDALONE: "1" });
   if (action === "deploy") {
-    const outputPath = `dist/${config.name}/wrangler.json`;
-    if (!existsSync(root + outputPath)) {
-      console.error(`Expected Vite Worker configuration is missing: ${outputPath}. Deployment cancelled.`);
+    // Vinext and the Cloudflare Vite plugin can emit their output config in
+    // different build subdirectories. Deploy only a verified production bundle.
+    const candidates = [
+      "dist/server/wrangler.json",
+      `dist/${config.name}/wrangler.json`,
+      "dist/wrangler.json"
+    ];
+    let outputPath = null;
+    for (const candidate of candidates) {
+      if (!existsSync(root + candidate)) continue;
+      const builtConfig = JSON.parse(readFileSync(root + candidate, "utf8"));
+      const builtDb = builtConfig.d1_databases?.find(x => x.binding === "DB");
+      if (builtConfig.name === config.name && builtDb?.database_id === db.database_id) {
+        outputPath = candidate;
+        break;
+      }
+    }
+    if (!outputPath) {
+      console.error("No generated Worker config matches the configured name and staging D1 ID. Deployment cancelled.");
       process.exit(1);
     }
-    const builtConfig = JSON.parse(readFileSync(root + outputPath, "utf8"));
-    const builtDb = builtConfig.d1_databases?.find(x => x.binding === "DB");
-    if (builtConfig.name !== config.name || builtDb?.database_id !== db.database_id) {
-      console.error("Built Worker targets a different database or Worker name. Deployment cancelled.");
-      process.exit(1);
-    }
+    console.log(`Deploying verified Cloudflare Worker bundle using ${outputPath}`);
     invoke("../node_modules/wrangler/bin/wrangler.js", ["deploy", "--config", outputPath]);
   }
 }
