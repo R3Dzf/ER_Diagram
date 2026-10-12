@@ -29,5 +29,18 @@ if (action === "migrate") {
     ["d1", "migrations", "apply", "DB", "--remote", "--config", "wrangler.standalone.jsonc"]);
 } else {
   invoke("./run-framework.mjs", ["build"], { ...process.env, BOSHA_STANDALONE: "1" });
-  if (action === "deploy") invoke("../node_modules/wrangler/bin/wrangler.js", ["deploy"]);
+  if (action === "deploy") {
+    const outputPath = `dist/${config.name}/wrangler.json`;
+    if (!existsSync(root + outputPath)) {
+      console.error(`Expected Vite Worker configuration is missing: ${outputPath}. Deployment cancelled.`);
+      process.exit(1);
+    }
+    const builtConfig = JSON.parse(readFileSync(root + outputPath, "utf8"));
+    const builtDb = builtConfig.d1_databases?.find(x => x.binding === "DB");
+    if (builtConfig.name !== config.name || builtDb?.database_id !== db.database_id) {
+      console.error("Built Worker targets a different database or Worker name. Deployment cancelled.");
+      process.exit(1);
+    }
+    invoke("../node_modules/wrangler/bin/wrangler.js", ["deploy", "--config", outputPath]);
+  }
 }
