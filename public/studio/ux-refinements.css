@@ -1,0 +1,128 @@
+/* UI refinement: navigation, notation switching, readability and touch-first layouts.
+   Loaded last to leave existing editor interactions, themes and exports intact. */
+:root{--ux-primary:#6366f1;--ux-primary-hover:#4f46e5;--ux-focus:#818cf8;--ux-radius:12px;--ux-text:#334155;--ux-muted:#64748b;--ux-border:#dfe5ef}
+button,a,select,input{ -webkit-tap-highlight-color:transparent }
+button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--ux-focus);outline-offset:3px}
+.header-google-signin{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:9px 14px!important;border:1px solid #d3dbea!important;border-radius:10px!important;background:#fff!important;color:#29384f!important;box-shadow:0 1px 3px #16274411;text-decoration:none;white-space:nowrap;font-size:12px!important;font-weight:650!important;transition:background .18s ease,border-color .18s ease,box-shadow .18s ease}
+.header-google-signin:hover{background:#f2f5ff!important;border-color:#aab6ee!important;box-shadow:0 4px 12px #16274412}
+.header-google-signin .google-g{width:18px;height:18px;flex-shrink:0}
+.header-google-signin .signin-compact{display:none}
+.rail-account .avatar{min-width:34px;min-height:34px;transition:transform .18s ease,border-color .18s ease}
+.rail-account .avatar:hover{transform:translateY(-1px);border-color:#a5b4fc}
+.rail-account:has(.avatar:focus-visible){border-radius:12px}
+.notation-strip{display:flex;justify-content:space-between;align-items:center;flex-shrink:0;gap:14px;min-height:59px;padding:9px 18px;background:#f8faff;border-bottom:1px solid var(--ux-border)}
+.notation-title{font-size:12px;line-height:1.3;font-weight:700;color:#334155}
+.notation-title small{display:block;font-size:10px;font-weight:450;color:#77869c;margin-top:3px}
+.notation-segments{display:inline-flex;flex-shrink:0;align-items:center;gap:3px;background:#e9edf8;padding:4px;border-radius:12px;border:1px solid #d9dfef}
+.notation-segments button{font-size:12px;font-weight:650;line-height:1.2;padding:10px 17px;min-height:39px;border-radius:9px;border:1px solid transparent;color:#4c5d78;white-space:nowrap;transition:background .18s ease,color .18s ease,box-shadow .18s ease}
+.notation-segments button:hover:not(:disabled){background:#dce3f8;color:#2b3f65}
+.notation-segments button[aria-pressed="true"]{background:#fff;color:#4338ca;border-color:#d6dcf5;box-shadow:0 1px 4px #202b4018}
+.notation-segments button:disabled{opacity:.6;cursor:not-allowed}
+.palette-bottom .legacy-notation{display:none}
+.palette-bottom>.field-help{font-size:11px;line-height:1.5;color:var(--ux-muted)}
+/* Keep compact editor controls readable and consistent. */
+.canvas-topbar .text-tool,.pro-toolbar button{font-size:11px;min-height:35px;border-radius:9px}
+.pro-toolbar{gap:7px;scrollbar-width:thin}
+.pro-toolbar button{padding:8px 12px;white-space:nowrap}
+.panel .field>span,.panel .field-help,.inspector .field>span{font-size:11px}
+.panel input,.panel select,.panel button{max-width:100%}
+.panel input,.panel select{min-height:36px;font-size:12px}
+.panel .shape-tools button{min-height:54px;border-radius:10px}
+.dashboard-select select{font-size:12px;color:#4f5368;min-height:39px;border-color:#dce1ee}
+.dashboard-select>span{font-size:11px;color:#5f6782}
+.dashboard-mode .rail-button,.dashboard-mode .rail-create{border-radius:10px}
+.dashboard-mode .rail-button{font-size:13px}
+.dashboard-mode .rail-account-details small{font-size:11px}
+.dashboard-mode .rail-account-details b{font-size:12px}
+.dashboard-mode .dashboard-tabs button{font-size:12px}
+.dashboard-mode .search-wrap input{font-size:12px}
+.dashboard-mode .page-intro p{font-size:12px;line-height:1.65}
+.dashboard-mode .overview-stat span,.dashboard-mode .overview-stat small{font-size:11px}
+.dashboard-mode .header .primary,.button.primary{border-radius:10px}
+.account-actions>.button,.account-actions>a{min-height:40px;display:inline-flex;align-items:center;justify-content:center;padding:9px 14px;line-height:1.35}
+.mobile-more-toggle,.mobile-more-menu{display:none}
+:root[data-theme="dark"]{--ux-text:#e2e8f0;--ux-muted:#a9b6c8;--ux-border:#303c4d;--ux-focus:#9ab4f0}
+[data-theme="dark"] .notation-strip{background:#171f2a;border-color:#303c4d}
+[data-theme="dark"] .notation-title{color:#dae6f5}
+[data-theme="dark"] .notation-title small{color:#9babc1}
+[data-theme="dark"] .notation-segments{background:#253248;border-color:#384760}
+[data-theme="dark"] .notation-segments button{color:#b3c2db}
+[data-theme="dark"] .notation-segments button:hover:not(:disabled){background:#30425d;color:#e5eeff}
+[data-theme="dark"] .notation-segments button[aria-pressed="true"]{background:#3f588b;color:#fff;border-color:#6b85b6}
+[data-theme="dark"] .header-google-signin{background:#273449!important;color:#f2f7ff!important;border-color:#485d7d!important;box-shadow:none}
+[data-theme="dark"] .header-google-signin:hover{background:#304561!important;border-color:#7f9fc6!important}
+[data-theme="dark"] .dashboard-select select{color:#e2e8f0;border-color:var(--border)}
+[data-theme="dark"] .palette-bottom>.field-help{color:#a9b6c8}
+@media(max-width:1190px){
+ .header-google-signin .signin-label{display:none}
+ .header-google-signin .signin-compact{display:inline}
+ .header-google-signin{padding:9px 10px!important}
+ .notation-title small{display:none}
+}
+@media(max-width:760px){
+ .app-main{min-width:0}
+ .header{padding:0 12px;gap:7px;min-height:60px;height:60px}
+ .header .brand,.header .breadcrumb{display:none}
+ .header-actions{width:100%;margin-left:0;justify-content:flex-end;gap:7px;min-width:0}
+ .header-actions #saveState,.header-actions #installAppBtn,.header-actions #themeBtn,.header-actions #openBtn,.header-actions #welcomeAccount{display:none!important}
+ .header-google-signin{min-height:40px;padding:9px 11px!important;font-size:12px!important}
+ .header-google-signin .signin-compact{display:inline}
+ .header-new-label{display:none}
+ .header-actions #headerNewBtn{height:40px;min-width:40px;padding:9px!important;justify-content:center}
+ .header-actions #exportBtn{min-height:40px;padding:9px 10px;font-size:11px}
+ .mobile-more-toggle{display:inline-flex!important;align-items:center;justify-content:center;gap:5px;min-height:40px;min-width:63px;padding:9px 8px!important;border:1px solid var(--ux-border);border-radius:10px;font-size:11px!important}
+ .mobile-more-menu:not([hidden]){display:flex;flex-direction:column;position:absolute;top:60px;right:8px;z-index:45;min-width:210px;max-width:calc(100vw - 70px);padding:7px;border-radius:13px;border:1px solid var(--ux-border);background:var(--panel);box-shadow:0 16px 36px #0f172a29}
+ .mobile-more-menu>button{display:flex;align-items:center;gap:11px;text-align:left;width:100%;min-height:44px;padding:11px 13px;font-size:13px;color:var(--ink);border-radius:9px}
+ .mobile-more-menu>button:hover,.mobile-more-menu>button:focus-visible{background:var(--dark-raised,#eef2ff)}
+ .notation-strip{min-height:55px;padding:7px 11px;gap:7px}
+ .notation-title{font-size:11px}
+ .notation-segments{gap:2px;padding:3px;border-radius:11px}
+ .notation-segments button{font-size:12px;min-height:40px;padding:9px 11px}
+ .canvas-topbar{height:auto;min-height:44px}
+ .canvas-topbar .text-tool{font-size:11px;min-height:40px}
+ .canvas-topbar>div{overflow-x:auto;scrollbar-width:none;justify-content:flex-start;gap:7px}
+ .canvas-topbar>div::-webkit-scrollbar{display:none}
+ .canvas-topbar>div>button{flex-shrink:0}
+ .pro-toolbar{min-height:48px;padding:6px 8px;overflow-x:auto;gap:6px;scrollbar-width:thin}
+ .pro-toolbar button{flex-shrink:0;min-height:38px;font-size:11px;padding:9px 12px}
+ .pro-toolbar #teamSummary{display:none}
+ .mobile-toggle{display:inline-flex}
+ .palette,.inspector{max-width:min(340px,calc(100vw - 64px));overflow-x:hidden}
+ .palette{width:min(290px,calc(100vw - 64px))}
+ .inspector{width:min(320px,calc(100vw - 64px))}
+ .palette .panel-heading,.inspector .panel-heading{position:sticky;top:0;z-index:1;background:var(--panel);padding:10px 0}
+ .palette .shape-tools button{min-height:56px}
+ .mobile-close{min-width:40px;min-height:40px}
+ .drawing-area{min-height:0}
+ .canvas-toolbar{max-width:calc(100% - 24px);overflow-x:auto;scrollbar-width:thin}
+ .canvas-toolbar .tool{min-width:38px;min-height:38px}
+ .dashboard-mode .dashboard{padding:22px 14px}
+ .dashboard-mode .header{height:60px;padding:0 9px}
+ .dashboard-mode .rail-account{min-height:40px}
+ .dashboard-mode .search-wrap input{font-size:13px;min-height:40px}
+ .dashboard-mode .dashboard-tabs>button{font-size:12px}
+ .dashboard-select{flex:1}
+ .dashboard-select select{min-height:42px;font-size:12px}
+}
+@media(max-width:440px){
+ .header{padding:0 7px}
+ .header-actions{gap:5px}
+ .header-google-signin{padding:9px 7px!important;gap:5px;font-size:11px!important}
+ .header-google-signin .google-g{width:16px;height:16px}
+ .header-actions #exportBtn{padding:9px!important;font-size:10px}
+ .mobile-more-toggle{gap:4px;min-width:55px;padding:8px 5px!important}
+ .notation-strip{padding:7px 8px}
+ .notation-title{font-size:10px}
+ .notation-segments button{padding:8px 8px;font-size:11px}
+ .canvas-topbar .text-tool{font-size:10px}
+ .dashboard-mode .dashboard{padding:18px 11px}
+ .dashboard-mode .project-grid,.dashboard-mode .template-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:330px){
+ .notation-title{display:none}
+ .notation-strip{justify-content:center}
+ .header-google-signin .google-g{display:none}
+ .mobile-more-toggle span:last-child{display:none}
+ .mobile-more-toggle{min-width:40px}
+}
+@media(prefers-reduced-motion:reduce){.header-google-signin,.notation-segments button,.rail-account .avatar{transition:none}}
