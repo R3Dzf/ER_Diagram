@@ -1,0 +1,40 @@
+name: Browser responsive QA
+
+on:
+  push:
+    branches: [deploy/independent-cloudflare-20261012]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: responsive-qa-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install isolated browser harness
+        run: |
+          npm install --prefix /tmp/bosha-browser-qa --no-save --ignore-scripts playwright@1.56.1
+          /tmp/bosha-browser-qa/node_modules/.bin/playwright install --with-deps chromium
+
+      - name: Verify real browser at phone, tablet, and desktop sizes
+        run: node .github/scripts/responsive-qa.cjs
+
+      - name: Upload responsive snapshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: responsive-qa-snapshots
+          path: qa-artifacts/
+          retention-days: 7
