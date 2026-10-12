@@ -77,3 +77,11 @@ test("dark palette raises canvas and diagram contrast without changing exported 
  const sw=contents("public/sw.js");
  assert.ok(sw.includes("/studio/dark-contrast.css"));
 });
+
+test("standalone interface uses clear labels and Google session logout", () => {
+  const html=contents("public/studio/index.html");
+  const app=contents("public/studio/app.js");
+  assert.doesNotMatch(html,/Design something great|A little shortcut goes a long way|beautifully connected/);
+  assert.ok(!app.includes("/signout-with-"),"Removed hosting-specific sign-out URLs must not return");
+  assert.match(app,/\/api\/auth\/google\/logout/);
+});

@@ -20,7 +20,7 @@ Only **one GitHub Actions secret** is required to launch the isolated staging Wo
 4. Check GitHub Actions and the new `https://er-diagram.r3dzf-studio.workers.dev` URL after successful deployment. Never assume it is live until verified. Set up the separate Google OAuth application in Google Cloud for account-based cloud sync; the optional `BOSHA_GOOGLE_CLIENT_ID` GitHub secret is available once the exact origin has been authorized.
 5. Once the first Worker exists, reduce the API token's Worker scope to Editor for only the `er-diagram` Worker where supported, retaining D1 Editor for future schema migrations.
 
-The old ChatGPT Site, its D1 database, and `main` are never targeted by this workflow. Keep the old site live until user data export/import and end-to-end tests are complete.
+The earlier hosted deployment, its database, and `main` are never targeted by this workflow. Keep the old site live until user data export/import and end-to-end tests are complete.
 
 ## Set up a new, isolated environment
 
