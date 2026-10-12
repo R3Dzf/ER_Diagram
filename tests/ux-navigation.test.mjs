@@ -45,3 +45,22 @@ test("responsive stylesheet is loaded after base styles, with mobile and dark co
   const cache = contents("public/sw.js");
   assert.ok(cache.includes("/studio/ux-refinements.css"), "Offline shell must cache responsive styles");
 });
+
+test("editor trims redundant explanations and exposes concise actions", () => {
+ const html=contents("public/studio/index.html");
+ assert.doesNotMatch(html,/Switch views from the bar above the canvas/);
+ assert.doesNotMatch(html,/Switch views without changing your model/);
+ assert.match(html,/>SQL<\/button>/);
+ assert.match(html,/>History<\/button>/);
+ const css=contents("public/studio/ux-refinements.css");
+ assert.match(css,/\.inspector \.inspector-tips\{display:none\}/);
+ assert.match(css,/\.palette \.shape-tools small\{display:none\}/);
+});
+test("history sync uses the same /studio/ route without disrupting share hashes", () => {
+ const app=contents("public/studio/app.js");
+ assert.match(app,/window\.history\[replace\?'replaceState':'pushState'\]/);
+ assert.match(app,/window\.addEventListener\('popstate'/);
+ assert.match(app,/url\.searchParams\.set\('diagram',activeId\)/);
+ assert.match(app,/url\.searchParams\.set\('view','templates'\)/);
+ assert.match(app,/url\.pathname\+url\.search\+url\.hash/);
+});

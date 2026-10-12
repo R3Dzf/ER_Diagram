@@ -32,6 +32,16 @@ const sizes = [
       else if(await page.locator('#newCard').isVisible())await page.locator('#newCard').click();
       else if(await page.locator('#headerNewBtn').isVisible())await page.locator('#headerNewBtn').click();
       await page.locator('#editor').waitFor({state:'visible',timeout:10000});
+      await page.waitForFunction(() => new URL(location.href).searchParams.has('diagram'));
+      const projectUrl=page.url();
+      await page.goBack({waitUntil:'domcontentloaded'});
+      await page.locator('#dashboard').waitFor({state:'visible',timeout:10000});
+      await page.goForward({waitUntil:'domcontentloaded'});
+      await page.locator('#editor').waitFor({state:'visible',timeout:10000});
+      assert.equal(page.url(),projectUrl,'Browser Forward did not restore diagram URL');
+      await page.reload({waitUntil:'domcontentloaded'});
+      await page.locator('#editor').waitFor({state:'visible',timeout:16000});
+      assert.equal(page.url(),projectUrl,'Refreshing project link lost navigation state');
       const chen=page.locator('[data-notation="chen"]');
       const crow=page.locator('[data-notation="crowfoot"]');
       assert.equal(await chen.getAttribute('aria-pressed'),'true','Chen must be initially active');

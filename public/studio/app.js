@@ -92,9 +92,37 @@ function undo(){finishLiveName();if(!requireEdit())return;const previous=history
 function redo(){finishLiveName();if(!requireEdit())return;const next=history.redo(model);if(!next)return;model=next;selected=null;selectionSet.clear();connectFrom=null;persist();render();}
 function node(){return model.nodes.find(n=>n.id===selected);}
 function edge(){return model.edges.find(e=>e.id===selected);}
-function setPage(value){finishLiveName();if(typeof closeMobileMore==='function')closeMobileMore();page=value;const editing=page==='editor';document.body.classList.toggle('dashboard-mode',!editing);$('editor').hidden=!editing;$('dashboard').hidden=editing;$('projectTitle').hidden=!editing;$('pageBreadcrumb').hidden=editing;$('saveBtn').hidden=!editing;$('exportBtn').hidden=!editing;$('shareBtn').hidden=!editing;$('collaborateBtn').hidden=!editing;$('headerNewBtn').hidden=editing;$('palette').classList.remove('open');$('inspector').classList.remove('open');for(const [nav,active] of [['workspaceNav',!editing&&dashboardTab==='diagrams'],['templatesNav',!editing&&dashboardTab==='templates'],['editorNav',editing]]){$(nav).classList.toggle('active',active);$(nav).setAttribute('aria-current',active?'page':'false');}saveLabel();}
-function showWorkspace(tab='diagrams'){dashboardTab=tab;setPage('workspace');$('diagramsTab').classList.toggle('active',tab==='diagrams');$('templatesTab').classList.toggle('active',tab==='templates');$('diagramsTab').setAttribute('aria-selected',String(tab==='diagrams'));$('templatesTab').setAttribute('aria-selected',String(tab==='templates'));$('notationFilterLabel').hidden=tab==='templates';$('projectSortLabel').hidden=tab==='templates';$('gridViewBtn').parentElement.hidden=tab==='templates';$('dashboardLaunchpad').hidden=tab==='templates';$('projectsView').hidden=tab!=='diagrams';$('templatesView').hidden=tab!=='templates';$('projectSearch').placeholder=tab==='diagrams'?'Search diagrams…':'Search templates…';$('projectSearch').value='';$('pageBreadcrumb').textContent=tab==='diagrams'?'My diagrams':'Templates';renderDashboard();}
-function openProject(projectId){finishLiveName();const project=db.projects.find(p=>p.id===projectId);if(!project)return;if(projectId===activeId&&model===project.model&&page!=='editor'){setPage('editor');render();fit();return;}activeId=project.id;model=project.model;selected=null;history.clear();$('outlineSearch').value='';setPage('editor');setMode('select');render();fit();persist(false);}
+
+let routingReady=false,routingMuted=false;
+function routeParams(){return new URLSearchParams(window.location?.search||'');}
+function syncRoute(replace=false){
+ if(!routingReady||routingMuted||!window.history?.pushState)return;
+ try{
+  const url=new URL(window.location.href);
+  for(const key of ['diagram','view','new'])url.searchParams.delete(key);
+  if(page==='editor'&&activeId)url.searchParams.set('diagram',activeId);
+  else if(dashboardTab==='templates')url.searchParams.set('view','templates');
+  const desired=url.pathname+url.search+url.hash;
+  if(desired!==window.location.pathname+window.location.search+window.location.hash)
+   window.history[replace?'replaceState':'pushState']({studioRoute:true},'',desired);
+ }catch{}
+}
+function restoreRoute(){
+ const params=routeParams(),target=params.get('diagram');
+ if(target&&db.projects.some(p=>p.id===target)){openProject(target);return true;}
+ if(params.get('view')==='templates'){showWorkspace('templates');return true;}
+ showWorkspace();return !target;
+}
+window.addEventListener('popstate',()=>{
+ if(!ready)return;
+ routingMuted=true;
+ let valid=true;
+ try{valid=restoreRoute();}finally{routingMuted=false;}
+ if(!valid)syncRoute(true);
+});
+function setPage(value){finishLiveName();if(typeof closeMobileMore==='function')closeMobileMore();page=value;const editing=page==='editor';document.body.classList.toggle('dashboard-mode',!editing);$('editor').hidden=!editing;$('dashboard').hidden=editing;$('projectTitle').hidden=!editing;$('pageBreadcrumb').hidden=editing;$('saveBtn').hidden=!editing;$('exportBtn').hidden=!editing;$('shareBtn').hidden=!editing;$('collaborateBtn').hidden=!editing;$('headerNewBtn').hidden=editing;$('palette').classList.remove('open');$('inspector').classList.remove('open');for(const [nav,active] of [['workspaceNav',!editing&&dashboardTab==='diagrams'],['templatesNav',!editing&&dashboardTab==='templates'],['editorNav',editing]]){$(nav).classList.toggle('active',active);$(nav).setAttribute('aria-current',active?'page':'false');}saveLabel();syncRoute();}
+function showWorkspace(tab='diagrams'){dashboardTab=tab;setPage('workspace');$('diagramsTab').classList.toggle('active',tab==='diagrams');$('templatesTab').classList.toggle('active',tab==='templates');$('diagramsTab').setAttribute('aria-selected',String(tab==='diagrams'));$('templatesTab').setAttribute('aria-selected',String(tab==='templates'));$('notationFilterLabel').hidden=tab==='templates';$('projectSortLabel').hidden=tab==='templates';$('gridViewBtn').parentElement.hidden=tab==='templates';$('dashboardLaunchpad').hidden=tab==='templates';$('projectsView').hidden=tab!=='diagrams';$('templatesView').hidden=tab!=='templates';$('projectSearch').placeholder=tab==='diagrams'?'Search diagrams…':'Search templates…';$('projectSearch').value='';$('pageBreadcrumb').textContent=tab==='diagrams'?'My diagrams':'Templates';renderDashboard();syncRoute();}
+function openProject(projectId){finishLiveName();const project=db.projects.find(p=>p.id===projectId);if(!project)return;if(projectId===activeId&&model===project.model&&page!=='editor'){setPage('editor');render();fit();syncRoute();return;}activeId=project.id;model=project.model;selected=null;history.clear();$('outlineSearch').value='';setPage('editor');setMode('select');render();fit();persist(false);syncRoute();}
 function newProject(source=blankDiagram()){if(!ready){toast('Wait for your workspace to connect.',true);return;}if(db.projects.length>=60){toast('Your workspace can hold up to 60 diagrams. Download and remove an older project to make room.',true);return;}const p=makeProject(source,id('p'));dismissWelcome();db.projects.push(p);openProject(p.id);return p;}
 function removeProject(projectId){if(db.projects.find(p=>p.id===projectId)?.role&&db.projects.find(p=>p.id===projectId).role!=='owner'){toast('Only the owner can delete a shared diagram.',true);return;}const index=db.projects.findIndex(p=>p.id===projectId);if(index<0)return;const removed=db.projects.splice(index,1)[0];if(cloud){db.deletions=db.deletions||[];db.deletions.push(removed);cloud.remove(removed);}if(activeId===projectId){activeId=null;db.activeId=null;model=blankDiagram();}persist(false);renderDashboard();toast('Diagram removed from this workspace.',false,()=>{if(db.projects.length>=60){toast('Make room in your workspace before restoring this diagram.',true);return;}db.projects.splice(Math.min(index,db.projects.length),0,removed);if(cloud){db.deletions=(db.deletions||[]).filter(p=>p.id!==removed.id);delete removed.deletedSynced;cloud.save(removed);}persist(false);renderDashboard();});}
 function dateLabel(timestamp){const diff=Math.max(0,Date.now()-timestamp);if(diff<60_000)return 'Just now';if(diff<3_600_000)return Math.floor(diff/60_000)+' min ago';if(diff<86_400_000)return Math.floor(diff/3_600_000)+' hr ago';return new Intl.DateTimeFormat('en',{month:'short',day:'numeric'}).format(timestamp);}
@@ -205,7 +233,25 @@ function rebaseHistory(pid,sent,remote){if(pid!==activeId)return;history.rebase(
 function rememberAccount(){try{localStorage.setItem(LAST_ACCOUNT,JSON.stringify(account));}catch{}}
 function restorePending(){for(const p of db.projects){if(p.conflict)cloud.blocked.add(p.id);else if(p.unsynced)cloud.save(p);}for(const p of db.deletions||[])cloud.remove(p);}
 function accountBadge(){$('accountBtn').textContent=account?account.name.slice(0,1).toUpperCase():'G';$('accountBtn').title=account?.name||'Account';$('headerGoogleSignIn').hidden=!!account;$('headerGoogleSignIn').title=account?'':'Sign in to sync diagrams across your devices';}
-function finishAccount(){ready=true;$('accountLoading').hidden=true;accountBadge();showWorkspace();if(!(loaded.readError&&!cloud))cacheWorkspace();if(!shortcutsApplied){shortcutsApplied=true;const params=new URLSearchParams(window.location?.search||'');if(params.get('new')==='1')newProject();else if(params.get('view')==='templates')showWorkspace('templates');}team?.checkInvitation();}
+function finishAccount(){
+ ready=true;$('accountLoading').hidden=true;accountBadge();
+ if(!(loaded.readError&&!cloud))cacheWorkspace();
+ const first=!shortcutsApplied;
+ routingMuted=true;
+ try{
+  if(first&&routeParams().get('new')==='1'){
+   showWorkspace();
+   shortcutsApplied=true;
+   newProject();
+  }else{
+   restoreRoute();
+   shortcutsApplied=true;
+  }
+ }finally{routingMuted=false;}
+ routingReady=true;
+ syncRoute(true);
+ team?.checkInvitation();
+}
 async function initializeAccount(){
  ready=false;$('accountLoading').hidden=false;$('retryAccount').hidden=true;
  try{
