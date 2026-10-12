@@ -138,8 +138,8 @@ For advanced setup, see the [development guide](docs/DEVELOPMENT.md) and [databa
 The public demo is hosted on **Cloudflare Workers** with a dedicated **Cloudflare D1** database.
 
 - **Live demo:** https://er-diagram.r3dzf-studio.workers.dev
-- **Independent deployment source:** [`deploy/independent-cloudflare-20261012`](https://github.com/R3Dzf/ER_Diagram/tree/deploy/independent-cloudflare-20261012)
-- **Hosting instructions:** [Independent Cloudflare deployment guide](https://github.com/R3Dzf/ER_Diagram/blob/deploy/independent-cloudflare-20261012/docs/INDEPENDENT_HOSTING.md)
+- **Source code:** [`main`](https://github.com/R3Dzf/ER_Diagram/tree/main)
+- **Hosting instructions:** [Independent Cloudflare deployment guide](https://github.com/R3Dzf/ER_Diagram/blob/main/docs/INDEPENDENT_HOSTING.md)
 
 The deployment is isolated from other environments. Saved accounts and projects are not automatically shared between different installations.
 

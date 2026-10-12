@@ -1,4 +1,4 @@
-name: Verify Bosha Studio
+name: Verify ER Diagram
 
 on:
   push:
@@ -33,3 +33,7 @@ jobs:
         run: pnpm run typecheck
       - name: Build Worker application
         run: pnpm run build
+      - name: Validate Cloudflare build (no deployment)
+        run: |
+          pnpm cloudflare:configure 11111111-1111-4111-8111-111111111111
+          pnpm cloudflare:build

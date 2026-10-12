@@ -1,0 +1,135 @@
+name: Deploy ER Diagram
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: er-diagram-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # Deploys only from main after verification.
+    if: ${{ github.ref == 'refs/heads/main' }}
+    outputs:
+      ready: ${{ steps.gate.outputs.ready }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CLOUDFLARE_ACCOUNT_ID: "6411cac8f04e7bc98a84aeac63fcebef"
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      D1_DATABASE_ID: "0022588d-62ab-4765-8ccf-294c7d00e2e4"
+      GOOGLE_CLIENT_ID: ${{ secrets.BOSHA_GOOGLE_CLIENT_ID }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+
+      - name: Check whether deployment is authorized
+        id: gate
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "Cloudflare deployment is disabled. Add CLOUDFLARE_API_TOKEN as a repository secret."
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install locked dependencies
+        if: steps.gate.outputs.ready == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify source and account isolation
+        if: steps.gate.outputs.ready == 'true'
+        run: |
+          pnpm test
+          pnpm typecheck
+
+      - name: Configure isolated D1 database
+        if: steps.gate.outputs.ready == 'true'
+        run: pnpm cloudflare:configure "$D1_DATABASE_ID"
+
+      - name: Apply schema to isolated D1 only
+        if: steps.gate.outputs.ready == 'true'
+        run: pnpm cloudflare:migrate
+
+      - name: Build and deploy independent Worker
+        if: steps.gate.outputs.ready == 'true'
+        run: pnpm cloudflare:deploy
+
+      - name: Configure optional Google sign-in
+        if: steps.gate.outputs.ready == 'true' && env.GOOGLE_CLIENT_ID != ''
+        run: printf '%s' "$GOOGLE_CLIENT_ID" | pnpm exec wrangler secret put GOOGLE_CLIENT_ID --config wrangler.standalone.jsonc
+
+      - name: Smoke-test deployed website and reject forged identity
+        if: steps.gate.outputs.ready == 'true'
+        run: node .github/scripts/verify-deployment.mjs
+
+      - name: Install isolated browser QA
+        if: steps.gate.outputs.ready == 'true'
+        run: |
+          npm install --prefix /tmp/bosha-browser-qa --no-save --ignore-scripts playwright@1.56.1
+          /tmp/bosha-browser-qa/node_modules/.bin/playwright install --with-deps chromium
+
+      - name: Test live responsive design after deployment
+        if: steps.gate.outputs.ready == 'true'
+        run: node .github/scripts/responsive-qa.cjs
+
+      - name: Save browser QA screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: deployed-responsive-qa
+          path: qa-artifacts/
+          retention-days: 7
+
+      - name: Publish next-step instructions
+        if: steps.gate.outputs.ready == 'true'
+        run: |
+          echo "ER Diagram deployed to its Cloudflare Worker and dedicated D1 database." >> "$GITHUB_STEP_SUMMARY"
+          echo "Verify the workers.dev URL in the Wrangler output and test guest mode, Google sign-in, data isolation, diagram save and export." >> "$GITHUB_STEP_SUMMARY"
+          echo "Previous hosting and databases were not modified." >> "$GITHUB_STEP_SUMMARY"
+
+  cleanup:
+    needs: deploy
+    if: ${{ github.ref == 'refs/heads/main' && needs.deploy.result == 'success' && needs.deploy.outputs.ready == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Delete verified obsolete branches
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for entry in \
+            "sync/sites-latest-source-20261012:390cc06c4f01709d35b647f224d14ed7a0bca75a" \
+            "deploy/independent-cloudflare-20261012:4ee89a7596f7b28683c0103357fd599ed51aa380"; do
+            branch="${entry%%:*}"
+            expected="${entry##*:}"
+            if ! actual="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/$branch" --jq '.object.sha' 2>/dev/null)"; then
+              echo "$branch already removed, or unavailable"
+              continue
+            fi
+            if [ "$actual" != "$expected" ]; then
+              echo "::warning::Skipping $branch; its head changed"
+              continue
+            fi
+            if gh api --method DELETE "repos/$GITHUB_REPOSITORY/git/refs/heads/$branch" >/dev/null; then
+              echo "Deleted $branch"
+            else
+              echo "::warning::Could not delete $branch; remove it in GitHub's Branches settings"
+            fi
+          done

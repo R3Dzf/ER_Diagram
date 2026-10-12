@@ -94,7 +94,7 @@ The dashboard offers search, notation filters, sorting, grid/list views, recent 
 
 ## Accounts and collaboration
 
-Sign in with ChatGPT on compatible Sites hosting, or with Google when configured. To keep the same workspace while adding Google, use **Connect Google to this account**. Matching email addresses do not automatically merge accounts.
+Sign in with Google when configured for this deployment. To keep the same workspace while adding Google, use **Connect Google to this account**. Matching email addresses do not automatically merge accounts.
 
 Owners can invite people as **Can edit** or **Can view & comment**. Each invitation link is single-use and expires after seven days. Share the link with the intended person yourself.
 
