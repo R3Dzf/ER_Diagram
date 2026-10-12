@@ -14,7 +14,7 @@ if (!existsSync(configPath)) {
 }
 const config = JSON.parse(readFileSync(configPath, "utf8"));
 const db = config.d1_databases?.find(x => x.binding === "DB");
-if (config.name !== "bosha-studio" || !/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(db?.database_id || "")) {
+if (config.name !== "er-diagram" || !/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(db?.database_id || "")) {
   console.error("Invalid standalone Cloudflare Worker or D1 configuration.");
   process.exit(1);
 }

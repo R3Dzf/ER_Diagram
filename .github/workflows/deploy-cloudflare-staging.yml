@@ -74,6 +74,6 @@ jobs:
       - name: Publish next-step instructions
         if: steps.gate.outputs.ready == 'true'
         run: |
-          echo "Cloudflare Worker bosha-studio deployed using the selected account and staging D1 database." >> "$GITHUB_STEP_SUMMARY"
+          echo "Cloudflare Worker er-diagram deployed using the selected account and staging D1 database." >> "$GITHUB_STEP_SUMMARY"
           echo "Verify the workers.dev URL in the Wrangler output and test guest mode, Google sign-in, data isolation, diagram save and export." >> "$GITHUB_STEP_SUMMARY"
           echo "The original ChatGPT Site, its database, and main branch were not changed." >> "$GITHUB_STEP_SUMMARY"

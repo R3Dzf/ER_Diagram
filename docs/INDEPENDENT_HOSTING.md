@@ -10,15 +10,15 @@ The standalone editor works in guest/local-device mode without Google configurat
 
 ## Browser-only deployment from GitHub Actions (recommended)
 
-The Cloudflare account is already connected, its free Workers subdomain is `r3dzf-studio.workers.dev`, and the **new staging** D1 database `bosha-studio` exists with ID `0022588d-62ab-4765-8ccf-294c7d00e2e4`. The account ID is `6411cac8f04e7bc98a84aeac63fcebef`. These are resource identifiers, **not** authentication credentials.
+The Cloudflare account is already connected, its free Workers subdomain is `r3dzf-studio.workers.dev`, and the **new staging** D1 database `bosha-studio` exists with ID `0022588d-62ab-4765-8ccf-294c7d00e2e4`. The account ID is `6411cac8f04e7bc98a84aeac63fcebef`. The independent Worker will be named `er-diagram` (the D1 database remains named `bosha-studio`). These are resource identifiers, **not** authentication credentials.
 
 Only **one GitHub Actions secret** is required to launch the isolated staging Worker:
 
 1. In your Cloudflare dashboard, create a restricted **account-scoped API token** with **Workers Admin** at the Workers product scope (needed to create the first Worker) and **D1 Editor** for the staging database or D1 product (needed for migrations). Restrict the token to this Cloudflare account. Never paste the token into commits, chats, issues, or logs.
 2. Open https://github.com/R3Dzf/ER_Diagram/settings/secrets/actions and create a repository secret named `CLOUDFLARE_API_TOKEN`; paste the value there.
-3. Trigger a fresh commit/push **only** to `deploy/independent-cloudflare-20261012`. That branch's `.github/workflows/deploy-cloudflare-staging.yml` will automatically run tests, apply schema migrations to this staging D1, build, and deploy `bosha-studio`. If the secret is absent, deployment steps skip safely. No variable or other secret is required for a guest-mode deployment.
-4. Check GitHub Actions and the new `https://bosha-studio.r3dzf-studio.workers.dev` URL after successful deployment. Never assume it is live until verified. Set up the separate Google OAuth application in Google Cloud for account-based cloud sync; the optional `BOSHA_GOOGLE_CLIENT_ID` GitHub secret is available once the exact origin has been authorized.
-5. Once the first Worker exists, reduce the API token's Worker scope to Editor for only this Worker where supported, retaining D1 Editor for future schema migrations.
+3. Trigger a fresh commit/push **only** to `deploy/independent-cloudflare-20261012`. That branch's `.github/workflows/deploy-cloudflare-staging.yml` will automatically run tests, apply schema migrations to this staging D1, build, and deploy `er-diagram`. If the secret is absent, deployment steps skip safely. No variable or other secret is required for a guest-mode deployment.
+4. Check GitHub Actions and the new `https://er-diagram.r3dzf-studio.workers.dev` URL after successful deployment. Never assume it is live until verified. Set up the separate Google OAuth application in Google Cloud for account-based cloud sync; the optional `BOSHA_GOOGLE_CLIENT_ID` GitHub secret is available once the exact origin has been authorized.
+5. Once the first Worker exists, reduce the API token's Worker scope to Editor for only the `er-diagram` Worker where supported, retaining D1 Editor for future schema migrations.
 
 The old ChatGPT Site, its D1 database, and `main` are never targeted by this workflow. Keep the old site live until user data export/import and end-to-end tests are complete.
 

@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "bosha-studio",
+  "name": "er-diagram",
   "main": "./build/sites-worker.ts",
   "compatibility_date": "2026-10-12",
   "compatibility_flags": ["nodejs_compat"],
