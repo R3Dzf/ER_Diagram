@@ -70,8 +70,8 @@ test("dark palette raises canvas and diagram contrast without changing exported 
  const css=contents("public/studio/dark-contrast.css");
  const links=[...parseHTML(html).document.querySelectorAll('link[rel="stylesheet"]')].map(x=>x.getAttribute('href'));
  assert.ok(links.indexOf('dark-contrast.css')>links.indexOf('ux-refinements.css'));
- assert.match(css,/data-theme="dark"\] \.canvas-wrap\{background:#30455e\}/);
- assert.match(css,/data-theme="dark"\] #graph \[data-kind="entity"\]>g\{fill:#496f95;stroke:#d1e3f5\}/);
+ assert.match(css,/data-theme="dark"\] \.canvas-wrap\{background:#486079\}/);
+ assert.match(css,/data-theme="dark"\] #graph \[data-kind="entity"\]>g\{fill:#608bb3;stroke:#d1e3f5\}/);
  assert.match(css,/data-theme="dark"\] #graph \[stroke="#486071"\]\{stroke:#c7d8eb\}/);
  assert.match(css,/data-theme="dark"\] #graph \[data-crow-card\]>rect/);
  const sw=contents("public/sw.js");

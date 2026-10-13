@@ -2,14 +2,14 @@
    The drawing area is a distinct slate surface with high-contrast nodes and lines.
    Scope every rule to the app's dark setting. Exports are unaffected. */
 :root[data-theme="dark"]{
- --dark-bg:#1b2736;
- --panel:#263649;
- --border:#394b60;
- --dark-raised:#304258;
- --dark-hover:#3b516c;
- --dark-selected:#375783;
- --ink:#eef4fc;
- --muted:#bdcbe0;
+ --dark-bg:#293747;
+ --panel:#364a5d;
+ --border:#51687e;
+ --dark-raised:#43596e;
+ --dark-hover:#4f6680;
+ --dark-selected:#54759d;
+ --ink:#f5f8ff;
+ --muted:#d0dce9;
  --dark-soft:#dae5f5;
  --dark-primary:#5b75ba;
  --dark-primary-hover:#6c89d0;
@@ -18,37 +18,37 @@
 }
 /* Navigation and panels remain dark but are visually separated. */
 :root[data-theme="dark"] .header,
-:root[data-theme="dark"] .dashboard-mode .header{background:#202e40;border-color:#3c5065}
+:root[data-theme="dark"] .dashboard-mode .header{background:#34465a;border-color:#3c5065}
 :root[data-theme="dark"] .rail,
-:root[data-theme="dark"] .dashboard-mode .rail{background:#142033;border-right:1px solid #36475e}
+:root[data-theme="dark"] .dashboard-mode .rail{background:#25364a;border-right:1px solid #36475e}
 :root[data-theme="dark"] .palette,
-:root[data-theme="dark"] .inspector{background:#263649;border-color:#40546b}
-:root[data-theme="dark"] .dashboard-mode .dashboard{background:#1d2b3c}
+:root[data-theme="dark"] .inspector{background:#364a5d;border-color:#40546b}
+:root[data-theme="dark"] .dashboard-mode .dashboard{background:#29394b}
 :root[data-theme="dark"] .canvas-topbar,
-:root[data-theme="dark"] .pro-toolbar{background:#263649;border-color:#40546b}
-:root[data-theme="dark"] .notation-strip{background:#293a50;border-color:#41546d}
-:root[data-theme="dark"] .notation-segments{background:#344963;border-color:#536985}
+:root[data-theme="dark"] .pro-toolbar{background:#364a5d;border-color:#40546b}
+:root[data-theme="dark"] .notation-strip{background:#40566a;border-color:#41546d}
+:root[data-theme="dark"] .notation-segments{background:#4b647d;border-color:#536985}
 :root[data-theme="dark"] .notation-segments button{color:#d6e4f5}
 :root[data-theme="dark"] .notation-segments button[aria-pressed="true"]{background:#5272a8;color:#fff;border-color:#7998c7;box-shadow:0 2px 8px #14223725}
 :root[data-theme="dark"] .pro-toolbar button,
 :root[data-theme="dark"] .palette .shape-tools button,
-:root[data-theme="dark"] .palette .connect-tool{background:#31455c;border:1px solid #485f79;color:#e2edfc}
+:root[data-theme="dark"] .palette .connect-tool{background:#456079;border:1px solid #485f79;color:#e2edfc}
 :root[data-theme="dark"] .pro-toolbar button:hover,
-:root[data-theme="dark"] .palette .shape-tools button:hover{background:#405a78;border-color:#7e9bc0;color:#fff}
-:root[data-theme="dark"] .canvas-toolbar{background:#223146;border:1px solid #4c6584;box-shadow:0 10px 26px #0f1b2c42}
+:root[data-theme="dark"] .palette .shape-tools button:hover{background:#53738f;border-color:#7e9bc0;color:#fff}
+:root[data-theme="dark"] .canvas-toolbar{background:#30465d;border:1px solid #4c6584;box-shadow:0 10px 26px #0f1b2c42}
 :root[data-theme="dark"] .tool{color:#d8e4f5}
 :root[data-theme="dark"] .tool.active{background:#6586ca;color:#fff}
 :root[data-theme="dark"] .zoom-controls{background:#293c53;border-color:#58718e}
-:root[data-theme="dark"] .statusbar{background:#223247;border-color:#40546b;color:#bacbe1}
+:root[data-theme="dark"] .statusbar{background:#334a61;border-color:#40546b;color:#bacbe1}
 :root[data-theme="dark"] .statusbar #interactionStatus{color:#cbd9eb}
 /* Actual drawing surface, not a dark void. Subtle grid stays behind diagram. */
-:root[data-theme="dark"] .canvas-wrap{background:#30455e}
+:root[data-theme="dark"] .canvas-wrap{background:#486079}
 :root[data-theme="dark"] #grid{opacity:.28}
 :root[data-theme="dark"] #dots circle{fill:#8396b1}
 /* Chen notation: light silhouettes, crisp borders, bright labels. */
-:root[data-theme="dark"] #graph [data-kind="entity"]>g{fill:#496f95;stroke:#d1e3f5}
-:root[data-theme="dark"] #graph [data-kind="relationship"]>g{fill:#635478;stroke:#dbcdec}
-:root[data-theme="dark"] #graph [data-kind="attribute"]>g{fill:#3d5b77;stroke:#c6daf0}
+:root[data-theme="dark"] #graph [data-kind="entity"]>g{fill:#608bb3;stroke:#d1e3f5}
+:root[data-theme="dark"] #graph [data-kind="relationship"]>g{fill:#77678f;stroke:#dbcdec}
+:root[data-theme="dark"] #graph [data-kind="attribute"]>g{fill:#527492;stroke:#c6daf0}
 :root[data-theme="dark"] #graph text{fill:#f6faff}
 :root[data-theme="dark"] #graph [data-key-underline]{stroke:#f6faff}
 :root[data-theme="dark"] #graph [data-selected="true"]>g{stroke:#f2e4ff}
@@ -56,35 +56,40 @@
 :root[data-theme="dark"] #graph [stroke="#304b5b"]{stroke:#c7d8eb}
 :root[data-theme="dark"] #graph [stroke="#cbd5e1"]{stroke:#7e9bb7}
 :root[data-theme="dark"] #graph [stroke="#6d5ce7"]{stroke:#cdb9ff}
-:root[data-theme="dark"] #graph [fill="white"]{fill:#30455e}
+:root[data-theme="dark"] #graph [fill="white"]{fill:#486079}
 :root[data-theme="dark"] #graph text[fill="#64748b"],
 :root[data-theme="dark"] #graph text[fill="#94a3b8"]{fill:#dde9f9}
 :root[data-theme="dark"] #graph text[fill="#6d5ce7"]{fill:#e0cfff}
 /* Crow's Foot: table cards should be legible at normal canvas zoom. */
-:root[data-theme="dark"] #graph [data-crow-card]>rect:nth-of-type(1){fill:#273d53}
-:root[data-theme="dark"] #graph [data-crow-card]>rect:nth-of-type(2){fill:#3c536e;stroke:#b7cbe3}
+:root[data-theme="dark"] #graph [data-crow-card]>rect:nth-of-type(1){fill:#37536c}
+:root[data-theme="dark"] #graph [data-crow-card]>rect:nth-of-type(2){fill:#506b86;stroke:#b7cbe3}
 :root[data-theme="dark"] #graph [data-crow-card="entity"]>rect:nth-of-type(3),
-:root[data-theme="dark"] #graph [data-crow-card="entity"]>rect:nth-of-type(4){fill:#4b76a0}
+:root[data-theme="dark"] #graph [data-crow-card="entity"]>rect:nth-of-type(4){fill:#688db6}
 :root[data-theme="dark"] #graph [data-crow-card="relationship"]>rect:nth-of-type(3),
-:root[data-theme="dark"] #graph [data-crow-card="relationship"]>rect:nth-of-type(4){fill:#655b88}
-:root[data-theme="dark"] #graph [data-crow-row] rect[fill="white"]{fill:#3c536e}
+:root[data-theme="dark"] #graph [data-crow-card="relationship"]>rect:nth-of-type(4){fill:#8273a1}
+:root[data-theme="dark"] #graph [data-crow-row] rect[fill="white"]{fill:#506b86}
 :root[data-theme="dark"] #graph [data-crow-row] rect[fill="#f8fafc"]{fill:#415c79}
 :root[data-theme="dark"] #graph [data-crow-row] rect[fill="#f1edff"]{fill:#5c527d}
 :root[data-theme="dark"] #graph [data-crow-row] rect[fill="#eaf6ff"]{fill:#5678a0}
 :root[data-theme="dark"] #graph [data-crow-row] rect[fill="#f1edff"]{fill:#5c527d}
 :root[data-theme="dark"] #graph [data-crow-row] text{fill:#f5faff}
 :root[data-theme="dark"] #graph .crow-label rect{fill:#405a77;stroke:#a9c1dd}
-:root[data-theme="dark"] #graph [data-cardinality] circle{fill:#30455e;stroke:#b7d0e9}
+:root[data-theme="dark"] #graph [data-cardinality] circle{fill:#486079;stroke:#b7d0e9}
 :root[data-theme="dark"] #graph [data-crow-card][data-selected="true"]>rect:nth-of-type(2){stroke:#ebdcff;stroke-width:3}
 /* Diagram previews: use the same readable palette without changing exports. */
 :root[data-theme="dark"] .card-preview,
-:root[data-theme="dark"] .dashboard-mode .card-preview{background-color:#30455e;border-color:#4b617b}
-:root[data-theme="dark"] .card-preview [data-kind="entity"]>g{fill:#496f95;stroke:#d1e3f5}
-:root[data-theme="dark"] .card-preview [data-kind="relationship"]>g{fill:#635478;stroke:#dbcdec}
-:root[data-theme="dark"] .card-preview [data-kind="attribute"]>g{fill:#3d5b77;stroke:#c6daf0}
+:root[data-theme="dark"] .dashboard-mode .card-preview{background-color:#486079;border-color:#4b617b}
+:root[data-theme="dark"] .card-preview [data-kind="entity"]>g{fill:#608bb3;stroke:#d1e3f5}
+:root[data-theme="dark"] .card-preview [data-kind="relationship"]>g{fill:#77678f;stroke:#dbcdec}
+:root[data-theme="dark"] .card-preview [data-kind="attribute"]>g{fill:#527492;stroke:#c6daf0}
 :root[data-theme="dark"] .card-preview text{fill:#f6faff}
 :root[data-theme="dark"] .card-preview [stroke="#486071"]{stroke:#c7d8eb}
 @media(max-width:760px){
- :root[data-theme="dark"] .canvas-wrap{background:#30455e}
- :root[data-theme="dark"] .canvas-toolbar{background:#223146}
+ :root[data-theme="dark"] .canvas-wrap{background:#486079}
+ :root[data-theme="dark"] .canvas-toolbar{background:#30465d}
 }
+
+:root[data-theme="dark"] .team-member{background:#3b5066;border-color:#5d7590}
+:root[data-theme="dark"] .team-export-toggle{color:#f3f7ff}
+.team-export-toggle{display:inline-flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;white-space:nowrap}
+.team-export-toggle input{width:17px;height:17px;accent-color:#5f7fae}

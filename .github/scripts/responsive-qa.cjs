@@ -64,7 +64,7 @@ const sizes = [
       await page.evaluate(() => localStorage.setItem('bosha-theme','dark'));
       await page.reload({waitUntil:'load'});
       await page.locator('#editor').waitFor({state:'visible',timeout:16000});
-      await page.waitForFunction(() => getComputedStyle(document.querySelector('.canvas-wrap')).backgroundColor === 'rgb(48, 69, 94)', null, {timeout:15000});
+      await page.waitForFunction(() => getComputedStyle(document.querySelector('.canvas-wrap')).backgroundColor === 'rgb(72, 96, 121)', null, {timeout:15000});
       const themeCheck=await page.evaluate(()=>{
         const node=document.querySelector('#graph [data-kind="entity"]>g');
         const canvas=document.querySelector('.canvas-wrap');
@@ -77,8 +77,8 @@ const sizes = [
         };
       });
       assert.equal(themeCheck.mode,'dark');
-      assert.equal(themeCheck.canvas,'rgb(48, 69, 94)');
-      assert.equal(themeCheck.shape,'rgb(73, 111, 149)');
+      assert.equal(themeCheck.canvas,'rgb(72, 96, 121)');
+      assert.equal(themeCheck.shape,'rgb(96, 139, 179)');
       assert.equal(themeCheck.outline,'rgb(209, 227, 245)');
       await page.screenshot({path:`qa-artifacts/${device.name}-editor-dark.png`,fullPage:true});
       const info=await page.evaluate(()=>({
