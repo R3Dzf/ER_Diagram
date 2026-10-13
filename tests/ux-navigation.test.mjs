@@ -85,3 +85,10 @@ test("standalone interface uses clear labels and Google session logout", () => {
   assert.ok(!app.includes("/signout-with-"),"Removed hosting-specific sign-out URLs must not return");
   assert.match(app,/\/api\/auth\/google\/logout/);
 });
+
+test("element shortcuts cancel the original key event before focusing the name field", () => {
+ const app=contents("public/studio/app.js");
+ assert.match(app,/if\(\['e','r','a'\]\.includes\(key\)\)\{event\.preventDefault\(\)/);
+ assert.match(app,/if\(event\.repeat\|\|event\.isComposing\)return/);
+ assert.match(app,/add\(\{e:'entity',r:'relationship',a:'attribute'\}\[key\]\)/);
+});
