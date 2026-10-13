@@ -69,6 +69,11 @@ const sizes = [
           'Shortcut '+key+' changed the element name to '+value);
       }
       await page.screenshot({path:`qa-artifacts/${device.name}-editor.png`,fullPage:true});
+      // The name inspector opens on compact screens after a shortcut. Close it
+      // before clicking a tool behind the panel, just as the user would.
+      if(device.width<=390){
+        await page.locator('#inspector [data-close="inspector"]').click();
+      }
       // Verify actual dark canvas and diagram colors in Chromium, not just CSS text.
       const addEntity = page.locator('.canvas-toolbar [data-add="entity"]');
       await addEntity.click();
